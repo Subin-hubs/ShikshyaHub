@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to ShikshyaHub{% endblock %}
+
+{% block content %}
+<section class="hero-section text-center" id="home">
+    <div class="container">
+        <h1 class="hero-title animate__animated animate__fadeInDown">Empowering Education Through Innovation</h1>
+        <p class="lead mb-4 animate__animated animate__fadeInUp">A modern, integrated platform for students and
+            educators to collaborate and excel.</p>
+        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center animate__animated animate__fadeInUp">
+            <button class="btn btn-primary btn-lg px-4 gap-3" data-bs-toggle="modal" data-bs-target="#signupModal">Get
+                Started</button>
+            <a href="#features" class="btn btn-outline-primary btn-lg px-4">Learn More</a>
+        </div>
+    </div>
+</section>
+
+<section class="features-section py-5" id="features">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-5">Key Features</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <h3 class="h4 mb-3">Smart Attendance</h3>
+                    <p class="text-muted">QR-based attendance system for quick and secure check-ins.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h3 class="h4 mb-3">Assignment Hub</h3>
+                    <p class="text-muted">Easy submission and tracking of coursework and deadlines.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="h4 mb-3">Progress Tracking</h3>
+                    <p class="text-muted">Real-time monitoring of academic performance and grades.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

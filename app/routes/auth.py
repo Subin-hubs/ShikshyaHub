@@ -10,7 +10,12 @@ auth = Blueprint('auth', __name__)
 def login():
     # If user is already logged in, send them to their dashboard
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+        if current_user.role == 'admin':
+            return redirect(url_for('admin.dashboard'))
+        elif current_user.role == 'teacher':
+            return redirect(url_for('teacher.dashboard'))
+        else:
+            return redirect(url_for('student.dashboard'))
     
     if request.method == 'POST':
         email = request.form.get('email')
@@ -22,7 +27,7 @@ def login():
         # Check if user exists and password is correct
         if not user or not user.check_password(password):
             flash('Please check your login details and try again.', 'danger')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('main.index')) # Redirect back to home for the modal
 
         login_user(user, remember=remember)
         
@@ -35,6 +40,31 @@ def login():
             return redirect(url_for('student.dashboard'))
 
     return render_template('auth/login.html')
+
+@auth.route('/register', methods=['POST'])
+def register():
+    # Get information from the Signup Modal
+    name = request.form.get('name')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    role = request.form.get('role')
+
+    # Check if the email is already in the database
+    user = User.query.filter_by(email=email).first()
+    if user:
+        flash('Email address already exists', 'danger')
+        return redirect(url_for('main.index'))
+
+    # Create the new user
+    new_user = User(name=name, email=email, role=role)
+    new_user.set_password(password)
+
+    # Save to database
+    db.session.add(new_user)
+    db.session.commit()
+
+    flash('Congratulations! Your account has been created.', 'success')
+    return redirect(url_for('main.index'))
 
 @auth.route('/logout')
 @login_required
