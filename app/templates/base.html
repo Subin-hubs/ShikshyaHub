@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
-<body style="opacity: 1;">
+<body>
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
@@ -20,20 +20,20 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center gap-2">
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('main.index') }}">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
 
                     {% if current_user.is_authenticated %}
-                    <li class="nav-item"><a class="btn btn-login" href="{{ url_for('auth.logout') }}">Logout</a></li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light ms-lg-2" href="{{ url_for('auth.logout') }}">Logout</a>
+                    </li>
                     {% else %}
                     <li class="nav-item">
-                        <button class="btn btn-login" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="btn btn-register" data-bs-toggle="modal"
-                            data-bs-target="#signupModal">Register</button>
+                        <button class="btn btn-login ms-lg-2" data-bs-toggle="modal"
+                            data-bs-target="#loginModal">Login</button>
                     </li>
                     {% endif %}
                 </ul>
@@ -63,71 +63,31 @@
                 <h3 class="fw-bold">ShikshyaHub</h3>
                 <p class="text-muted">Where Education Meets Innovation</p>
             </div>
-            <div class="social-links mb-4">
-                <a href="#" class="text-white mx-2"><i class="fab fa-facebook"></i></a>
-                <a href="#" class="text-white mx-2"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="text-white mx-2"><i class="fab fa-linkedin"></i></a>
-            </div>
             <hr class="bg-secondary">
-            <p class="mb-0 text-muted">&copy; 2024 ShikshyaHub. All rights reserved.</p>
+            <p class="mb-0 text-muted">&copy; 2026 ShikshyaHub. All rights reserved.</p>
         </div>
     </footer>
 
     <div class="modal fade" id="loginModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title fw-bold">Login to ShikshyaHub</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
                     <form action="{{ url_for('auth.login') }}" method="POST">
                         <div class="mb-3">
-                            <label class="form-label">Email address</label>
+                            <label class="form-label text-dark fw-bold">Email address</label>
                             <input type="email" name="email" class="form-control" placeholder="name@example.com"
                                 required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Password</label>
+                            <label class="form-label text-dark fw-bold">Password</label>
                             <input type="password" name="password" class="form-control" placeholder="Enter password"
                                 required>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Login</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="signupModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title fw-bold">Create an Account</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <form action="{{ url_for('auth.register') }}" method="POST">
-                        <div class="mb-3">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" name="name" class="form-control" placeholder="John Doe" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email address</label>
-                            <input type="email" name="email" class="form-control" placeholder="name@example.com" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Role</label>
-                            <select name="role" class="form-select" required>
-                                <option value="student">Student</option>
-                                <option value="teacher">Teacher</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Password</label>
-                            <input type="password" name="password" class="form-control" placeholder="Create password"
-                                required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Sign Up</button>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Sign In</button>
                     </form>
                 </div>
             </div>

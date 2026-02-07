@@ -1,0 +1,599 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-container">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark"
+        style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('student.dashboard') }}">
+                <i class="fas fa-graduation-cap"></i> ShikshyaHub
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('student.dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('student.courses') }}">Courses</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('student.attendance') }}">Attendance</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('student.grades') }}">Grades</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('student.assignments') }}">Assignments</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link active" href="{{ url_for('student.notices') }}">Notices</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                            data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i> {{ current_user.name }}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h5>Student Menu</h5>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="{{ url_for('student.dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="{{ url_for('student.courses') }}"><i class="fas fa-book"></i> My Courses</a></li>
+            <li><a href="{{ url_for('student.attendance') }}"><i class="fas fa-clipboard-check"></i> Attendance</a></li>
+            <li><a href="{{ url_for('student.grades') }}"><i class="fas fa-star"></i> Grades</a></li>
+            <li><a href="{{ url_for('student.assignments') }}"><i class="fas fa-tasks"></i> Assignments</a></li>
+            <li><a href="{{ url_for('student.notices') }}" class="active"><i class="fas fa-bell"></i> Notices</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1><i class="fas fa-bell"></i> Announcements & Notices</h1>
+                <p>Stay updated with the latest announcements from your institution</p>
+            </div>
+
+            <!-- Flash Messages -->
+            {% if get_flashed_messages() %}
+            {% for message in get_flashed_messages() %}
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs mb-4">
+                <button class="filter-btn active" data-filter="all">
+                    <i class="fas fa-list"></i> All Notices
+                </button>
+                <button class="filter-btn" data-filter="important">
+                    <i class="fas fa-star"></i> Important
+                </button>
+                <button class="filter-btn" data-filter="academic">
+                    <i class="fas fa-book"></i> Academic
+                </button>
+                <button class="filter-btn" data-filter="event">
+                    <i class="fas fa-calendar"></i> Events
+                </button>
+            </div>
+
+            <!-- Notices Grid -->
+            <div class="notices-container">
+                <!-- Sample Notice 1 -->
+                <div class="notice-card" data-category="important">
+                    <div class="notice-header">
+                        <div class="notice-badge important">
+                            <i class="fas fa-star"></i> Important
+                        </div>
+                        <span class="notice-date">Today, 2:30 PM</span>
+                    </div>
+                    <div class="notice-content">
+                        <h3><i class="fas fa-exclamation-circle"></i> Upcoming Midterm Examinations</h3>
+                        <p>Midterm examinations will be conducted from January 28 to February 5, 2026. Please check the
+                            examination schedule in the portal.</p>
+                        <div class="notice-footer">
+                            <span class="notice-from">By: Administration</span>
+                            <button class="btn-read-more">Read More</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sample Notice 2 -->
+                <div class="notice-card" data-category="event">
+                    <div class="notice-header">
+                        <div class="notice-badge event">
+                            <i class="fas fa-calendar"></i> Event
+                        </div>
+                        <span class="notice-date">January 26, 10:00 AM</span>
+                    </div>
+                    <div class="notice-content">
+                        <h3><i class="fas fa-users"></i> Annual College Fest 2026</h3>
+                        <p>Join us for the Annual College Fest 2026! It will be a day filled with cultural performances,
+                            competitions, and food. Register now through the events portal.</p>
+                        <div class="notice-footer">
+                            <span class="notice-from">By: Student Affairs</span>
+                            <button class="btn-read-more">Read More</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sample Notice 3 -->
+                <div class="notice-card" data-category="academic">
+                    <div class="notice-header">
+                        <div class="notice-badge academic">
+                            <i class="fas fa-book"></i> Academic
+                        </div>
+                        <span class="notice-date">January 25, 9:15 AM</span>
+                    </div>
+                    <div class="notice-content">
+                        <h3><i class="fas fa-download"></i> Course Materials Updated</h3>
+                        <p>Course materials for "Advanced Web Development" have been updated. Please download the latest
+                            notes and resources from the course portal.</p>
+                        <div class="notice-footer">
+                            <span class="notice-from">By: Dr. Sharma</span>
+                            <button class="btn-read-more">Read More</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sample Notice 4 -->
+                <div class="notice-card" data-category="academic">
+                    <div class="notice-header">
+                        <div class="notice-badge academic">
+                            <i class="fas fa-book"></i> Academic
+                        </div>
+                        <span class="notice-date">January 24, 3:45 PM</span>
+                    </div>
+                    <div class="notice-content">
+                        <h3><i class="fas fa-clock"></i> Assignment Submission Extended</h3>
+                        <p>The submission deadline for the Data Structures assignment has been extended to January 30,
+                            2026 at 11:59 PM.</p>
+                        <div class="notice-footer">
+                            <span class="notice-from">By: Prof. Kumar</span>
+                            <button class="btn-read-more">Read More</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sample Notice 5 -->
+                <div class="notice-card" data-category="event">
+                    <div class="notice-header">
+                        <div class="notice-badge event">
+                            <i class="fas fa-calendar"></i> Event
+                        </div>
+                        <span class="notice-date">January 23, 1:20 PM</span>
+                    </div>
+                    <div class="notice-content">
+                        <h3><i class="fas fa-presentation"></i> Scholarship Opportunity Webinar</h3>
+                        <p>Attend our webinar on scholarship opportunities for international higher education. Guest
+                            speakers from leading universities will present their programs.</p>
+                        <div class="notice-footer">
+                            <span class="notice-from">By: International Relations</span>
+                            <button class="btn-read-more">Read More</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sample Notice 6 -->
+                <div class="notice-card" data-category="important">
+                    <div class="notice-header">
+                        <div class="notice-badge important">
+                            <i class="fas fa-star"></i> Important
+                        </div>
+                        <span class="notice-date">January 22, 11:30 AM</span>
+                    </div>
+                    <div class="notice-content">
+                        <h3><i class="fas fa-info-circle"></i> Portal Maintenance Notice</h3>
+                        <p>The student portal will be under maintenance on January 27 from 10:00 PM to 2:00 AM. Please
+                            plan accordingly to access required information.</p>
+                        <div class="notice-footer">
+                            <span class="notice-from">By: IT Department</span>
+                            <button class="btn-read-more">Read More</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-state-icon">
+                    <i class="fas fa-envelope-open"></i>
+                </div>
+                <h3>No Notices Available</h3>
+                <p>There are no notices in this category. Check back later!</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+    body {
+        background-color: #f8fafc;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .page-container {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    .navbar {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        position: relative;
+        z-index: 100;
+    }
+
+    .sidebar {
+        width: 260px;
+        background-color: white;
+        padding: 20px 0;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        margin-top: 56px;
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar.show {
+        display: block;
+    }
+
+    .sidebar-toggle {
+        position: fixed;
+        left: 10px;
+        top: 70px;
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        color: white;
+        border: none;
+        padding: 10px 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 99;
+        font-size: 18px;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .main-content {
+        flex: 1;
+        margin-left: 260px;
+        margin-top: 56px;
+        padding: 30px;
+    }
+
+    .page-header {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .page-header h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 10px 0;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .filter-tabs {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        background-color: white;
+        border: 2px solid #e5e7eb;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #64748b;
+        transition: all 0.3s ease;
+    }
+
+    .filter-btn:hover {
+        border-color: #2563eb;
+        color: #2563eb;
+    }
+
+    .filter-btn.active {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        color: white;
+        border-color: #2563eb;
+    }
+
+    .notices-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+    }
+
+    .notice-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border-left: 4px solid #e5e7eb;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .notice-card:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+    }
+
+    .notice-card[data-category="important"] {
+        border-left-color: #dc2626;
+    }
+
+    .notice-card[data-category="academic"] {
+        border-left-color: #2563eb;
+    }
+
+    .notice-card[data-category="event"] {
+        border-left-color: #059669;
+    }
+
+    .notice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .notice-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .notice-badge.important {
+        background-color: #fee2e2;
+        color: #dc2626;
+    }
+
+    .notice-badge.academic {
+        background-color: #dbeafe;
+        color: #2563eb;
+    }
+
+    .notice-badge.event {
+        background-color: #d1fae5;
+        color: #059669;
+    }
+
+    .notice-date {
+        font-size: 12px;
+        color: #94a3b8;
+    }
+
+    .notice-content h3 {
+        margin: 0 0 10px 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .notice-content p {
+        margin: 0 0 15px 0;
+        color: #64748b;
+        line-height: 1.6;
+        font-size: 14px;
+    }
+
+    .notice-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .notice-from {
+        font-size: 12px;
+        color: #94a3b8;
+        font-weight: 600;
+    }
+
+    .btn-read-more {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-read-more:hover {
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-state-icon {
+        font-size: 64px;
+        color: #cbd5e1;
+        margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+        color: #64748b;
+        font-size: 24px;
+        margin: 0 0 10px 0;
+    }
+
+    .empty-state p {
+        color: #94a3b8;
+        margin: 0;
+    }
+
+    .sidebar-header {
+        padding: 0 20px 20px 20px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .sidebar-header h5 {
+        color: #1e293b;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar-menu li {
+        margin: 0;
+    }
+
+    .sidebar-menu li a {
+        display: block;
+        padding: 12px 20px;
+        color: #64748b;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+
+    .sidebar-menu li a:hover,
+    .sidebar-menu li a.active {
+        background-color: #f0f9ff;
+        color: #2563eb;
+        border-left-color: #2563eb;
+        padding-left: 17px;
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 100%;
+            position: fixed;
+            left: 0;
+            top: 56px;
+            height: calc(100vh - 56px);
+            transform: translateX(-100%);
+            z-index: 98;
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+
+        .main-content {
+            margin-left: 0;
+            padding: 20px;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+        }
+
+        .notices-container {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-tabs {
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+    }
+</style>
+
+<script>
+    // Sidebar Toggle
+    document.getElementById('sidebarToggle').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('show');
+    });
+
+    // Filter functionality
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const filter = this.dataset.filter;
+            const cards = document.querySelectorAll('.notice-card');
+            let visibleCount = 0;
+
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            cards.forEach(card => {
+                if (filter === 'all' || card.dataset.category === filter) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            const emptyState = document.getElementById('emptyState');
+            emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+        });
+    });
+
+    // Toast Notifications
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.transition = 'opacity 0.5s ease';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        }, 5000);
+    });
+</script>
+{% endblock %}

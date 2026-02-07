@@ -373,7 +373,9 @@
                                             <button class="btn btn-sm btn-primary" title="Edit User">
                                                 <i class="fas fa-edit"></i> Edit
                                             </button>
-                                            <button class="btn btn-sm btn-danger" title="Delete User">
+                                            <button class="btn btn-sm btn-danger delete-user-btn"
+                                                data-user-id="{{ user.id }}" data-user-name="{{ user.name }}"
+                                                title="Delete User">
                                                 <i class="fas fa-trash"></i> Delete
                                             </button>
                                         </td>
@@ -446,25 +448,78 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Search functionality
+        // SEARCH FUNCTIONALITY
         document.getElementById('searchInput').addEventListener('keyup', function () {
             const searchValue = this.value.toLowerCase();
             const tableRows = document.querySelectorAll('#usersTable tbody tr');
 
             tableRows.forEach(row => {
                 const text = row.textContent.toLowerCase();
-                if (text.includes(searchValue)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+                row.style.display = text.includes(searchValue) ? '' : 'none';
             });
         });
 
-        // Mobile sidebar toggle
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('active');
+        // ADD USER FUNCTIONALITY
+        const addBtn = document.querySelector('#addUserModal .modal-footer .btn-primary');
+
+        addBtn.addEventListener('click', function () {
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            const role = document.getElementById('userRole').value;
+            const password = document.getElementById('userPassword').value;
+
+            if (!name || !email || !role || !password) {
+                alert("Please fill in all fields");
+                return;
+            }
+
+            const userData = { name, email, role, password };
+
+            fetch('/admin/api/add-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert("Error: " + data.message);
+                    }
+                })
+                .catch(err => console.error('Error:', err));
+        });
+
+        // DELETE USER EVENT LISTENER
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll(".delete-user-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const userId = btn.getAttribute("data-user-id");
+                    const userName = btn.getAttribute("data-user-name");
+
+                    deleteUser(userId, userName);
+                });
+            });
+        });
+
+        // DELETE USER FUNCTION
+        function deleteUser(userId, userName) {
+            if (confirm(`Are you sure you want to delete ${userName}? This will remove all their grades and records.`)) {
+                fetch(`/admin/api/delete-user/${userId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert("Error: " + data.message);
+                        }
+                    })
+                    .catch(err => console.error('Error:', err));
+            }
         }
     </script>
 </body>

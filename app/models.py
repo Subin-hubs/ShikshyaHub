@@ -3,7 +3,6 @@ from app import db, login_manager
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# Helper to find a user by their ID
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -16,6 +15,12 @@ class User(db.Model, UserMixin):
     role = db.Column(db.String(20), nullable=False) # 'admin', 'teacher', 'student'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # RELATIONSHIPS: These allow you to access profile info easily
+    # uselist=False makes it a 1-to-1 relationship
+    # cascade="all, delete-orphan" means if User is deleted, these are deleted too
+    student_profile = db.relationship('Student', backref='user_account', cascade='all, delete-orphan', uselist=False)
+    teacher_profile = db.relationship('Teacher', backref='user_account', cascade='all, delete-orphan', uselist=False)
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
@@ -25,24 +30,33 @@ class User(db.Model, UserMixin):
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    student_id_no = db.Column(db.String(20), unique=True, nullable=False) # College ID
+    student_id_no = db.Column(db.String(20), unique=True, nullable=False)
     year = db.Column(db.String(10))
     semester = db.Column(db.String(10))
+    
+    # Links to other data
+    enrollments = db.relationship('Enrollment', backref='student', cascade='all, delete-orphan')
+    attendance = db.relationship('Attendance', backref='student', cascade='all, delete-orphan')
+    grades = db.relationship('Grade', backref='student', cascade='all, delete-orphan')
 
 class Teacher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     employee_id = db.Column(db.String(20), unique=True, nullable=False)
     department = db.Column(db.String(100))
+    
+    # A teacher can teach many courses
+    courses = db.relationship('Course', backref='instructor', lazy=True)
 
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     code = db.Column(db.String(20), unique=True, nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'))
-    # Relationships
-    enrollments = db.relationship('Enrollment', backref='course', lazy=True)
-    assignments = db.relationship('Assignment', backref='course', lazy=True)
+    
+    enrollments = db.relationship('Enrollment', backref='course', cascade='all, delete-orphan')
+    assignments = db.relationship('Assignment', backref='course', cascade='all, delete-orphan')
+    attendance = db.relationship('Attendance', backref='course', cascade='all, delete-orphan')
 
 class Enrollment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
