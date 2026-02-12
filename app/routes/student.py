@@ -5,7 +5,8 @@ from datetime import datetime
 from werkzeug.utils import secure_filename
 import os
 
-student = Blueprint('student', __name__)
+student = Blueprint('student', __name__, url_prefix='/student')
+
 
 # Helper to get student info
 def get_student_info():
@@ -15,7 +16,7 @@ def get_student_info():
         return None
     return student_info
 
-@student.route('/student/dashboard')
+@student.route('/dashboard')
 @login_required
 def dashboard():
     # Only let students access this page
@@ -30,7 +31,7 @@ def dashboard():
     enrollments = Enrollment.query.filter_by(student_id=student_info.id).all()
     return render_template('student/dashboard.html', student=student_info, enrollments=enrollments)
 
-@student.route('/student/courses')
+@student.route('/courses')
 @login_required
 def courses():
     student_info = get_student_info()
@@ -39,7 +40,7 @@ def courses():
     enrollments = Enrollment.query.filter_by(student_id=student_info.id).all()
     return render_template('student/courses.html', enrollments=enrollments)
 
-@student.route('/student/attendance')
+@student.route('attendance')
 @login_required
 def attendance():
     student_info = get_student_info()
@@ -48,7 +49,7 @@ def attendance():
     attendance_records = Attendance.query.filter_by(student_id=student_info.id).all()
     return render_template('student/attendance.html', attendance=attendance_records)
 
-@student.route('/student/grades')
+@student.route('grades')
 @login_required
 def grades():
     if current_user.role != 'student':
@@ -74,7 +75,7 @@ def grades():
     
     return render_template('student/grades.html', grades=grades_data, gpa=gpa, total_courses=total_courses)
 
-@student.route('/student/notices')
+@student.route('notices')
 @login_required
 def notices():
     if current_user.role != 'student':
@@ -85,7 +86,7 @@ def notices():
     notices_data = []
     return render_template('student/notices.html', notices=notices_data)
 
-@student.route('/student/assignments')
+@student.route('assignments')
 @login_required
 def assignments():
     if current_user.role != 'student':
