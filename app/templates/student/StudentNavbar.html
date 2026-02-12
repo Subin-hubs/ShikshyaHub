@@ -1,0 +1,92 @@
+<!-- templates/navbar.html -->
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <a href="{{ url_for('student.dashboard') }}"
+        class="sidebar-link {% if request.endpoint == 'student.dashboard' %}active{% endif %}">
+        <i class="fas fa-home"></i> Dashboard
+    </a>
+    <a href="{{ url_for('student.courses') }}"
+        class="sidebar-link {% if request.endpoint == 'student.courses' %}active{% endif %}">
+        <i class="fas fa-book"></i> Courses
+    </a>
+    <a href="{{ url_for('student.attendance') }}"
+        class="sidebar-link {% if request.endpoint == 'student.attendance' %}active{% endif %}">
+        <i class="fas fa-check-circle"></i> Attendance
+    </a>
+    <a href="{{ url_for('student.grades') }}"
+        class="sidebar-link {% if request.endpoint == 'student.grades' %}active{% endif %}">
+        <i class="fas fa-star"></i> Grades
+    </a>
+    <a href="{{ url_for('student.notices') }}"
+        class="sidebar-link {% if request.endpoint == 'student.notices' %}active{% endif %}">
+        <i class="fas fa-bell"></i> Notices
+    </a>
+    <a href="{{ url_for('student.assignments') }}"
+        class="sidebar-link {% if request.endpoint == 'student.assignments' %}active{% endif %}">
+        <i class="fas fa-tasks"></i> Assignments
+    </a>
+    <a href="{{ url_for('auth.logout') }}" class="sidebar-link">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+</div>
+
+
+<!-- Sidebar toggle button (mobile) -->
+<button class="sidebar-toggle d-md-none" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+<style>
+    /* --- Sidebar CSS --- */
+    .sidebar {
+        width: 220px;
+        background: #2c3e50;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding-top: 20px;
+        transition: left 0.3s;
+    }
+
+    .sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        margin: 5px 10px;
+        transition: 0.2s;
+    }
+
+    .sidebar-link:hover,
+    .sidebar-link.active {
+        background: #34495e;
+    }
+
+    .sidebar-toggle {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        background: #2980b9;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 6px;
+        z-index: 1000;
+    }
+
+    @media (min-width: 768px) {
+        .sidebar-toggle {
+            display: none;
+        }
+    }
+</style>
+
+<script>
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    sidebarToggle?.addEventListener('click', () => {
+        sidebar.classList.toggle('show');
+    });
+</script>

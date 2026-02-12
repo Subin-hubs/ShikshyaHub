@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance - Teacher Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">TP</div>
+        <div class="sidebar-title">Teacher Portal</div>
+        <div class="sidebar-subtitle">Computer Science</div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="teacher_dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+          <li><a href="routine.html"><span class="icon">📅</span> Routine</a></li>
+          <li><a href="course.html"><span class="icon">📚</span> Course</a></li>
+          <li><a href="assignments.html"><span class="icon">📝</span> Assignments</a></li>
+          <li><a href="results.html"><span class="icon">🎯</span> Results</a></li>
+          <li><a href="attendance.html"><span class="icon">✓</span> Attendance</a></li>
+          <li><a href="noticeboard.html"><span class="icon">📢</span> Noticeboard</a></li>
+          <li><a href="profile.html"><span class="icon">👤</span> Profile</a></li>
+          <li><button id="logout-btn"><span class="icon">🚪</span> Logout</button></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Attendance Management</h1>
+        <p>Mark and track student attendance.</p>
+      </div>
+
+      <!-- Attendance Form Section -->
+      <div id="attendance-form"></div>
+
+      <!-- Attendance Table Section -->
+      <div id="attendance-table"></div>
+    </main>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
