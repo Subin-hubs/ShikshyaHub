@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Assignments – Student Portal</title>
+  <title>Fees – Student Portal</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body data-page="assignments">
+<body data-page="fees">
 
 <!-- ═══════════════════════════════════════════════
      NAVBAR  (identical on every page)
@@ -35,7 +35,7 @@
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
       Results
     </a>
-    <a class="nav-link active" href="assignments.html">
+    <a class="nav-link" href="assignments.html">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
       Assignments
     </a>
@@ -47,7 +47,7 @@
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
       Notice Board
     </a>
-    <a class="nav-link" href="fees.html">
+    <a class="nav-link active" href="fees.html">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       Fees
     </a>
@@ -69,20 +69,21 @@
   <a class="nav-link" href="dashboard.html">🏠 Dashboard</a>
   <a class="nav-link" href="courses.html">📚 Courses</a>
   <a class="nav-link" href="results.html">📊 Results</a>
-  <a class="nav-link active" href="assignments.html">📝 Assignments</a>
+  <a class="nav-link" href="assignments.html">📝 Assignments</a>
   <a class="nav-link" href="attendance.html">✅ Attendance</a>
   <a class="nav-link" href="noticeboard.html">🔔 Notice Board</a>
-  <a class="nav-link" href="fees.html">💰 Fees</a>
+  <a class="nav-link active" href="fees.html">💰 Fees</a>
   <button class="nav-link logout-trigger" style="background:none;border:none;text-align:left;color:var(--rose);font-family:var(--font);">🚪 Logout</button>
 </div>
 
 <!-- PAGE CONTENT -->
 <div class="page-wrapper">
   <div class="page-heading">
-    <h1>Assignments</h1>
-    <p>Track your pending and submitted assignments across all courses</p>
+    <h1>Fees & Payments</h1>
+    <p>Semester V fee summary, payment status, and transaction history</p>
   </div>
-  <div id="assignments-table"></div>
+  <div id="fee-status"></div>
+  <div id="fee-history"></div>
 </div>
 
 <script src="js/script.js"></script>
