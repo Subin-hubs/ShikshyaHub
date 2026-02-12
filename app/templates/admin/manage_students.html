@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Students - College Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>College Portal</h2>
+      <p>Admin Panel</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="admin_dashboard.html">
+            <span class="nav-icon">📊</span>
+            Dashboard
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Management</div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_students.html">
+            <span class="nav-icon">👨‍🎓</span>
+            Manage Students
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_teachers.html">
+            <span class="nav-icon">👨‍🏫</span>
+            Manage Teachers
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_courses.html">
+            <span class="nav-icon">📚</span>
+            Manage Courses
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_assignments.html">
+            <span class="nav-icon">📝</span>
+            Manage Assignments
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_results.html">
+            <span class="nav-icon">🎯</span>
+            Manage Results
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_attendance.html">
+            <span class="nav-icon">✓</span>
+            Manage Attendance
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_noticeboard.html">
+            <span class="nav-icon">📢</span>
+            Manage Notices
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_fees.html">
+            <span class="nav-icon">💰</span>
+            Manage Fees
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Account</div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="profile.html">
+            <span class="nav-icon">👤</span>
+            Profile
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="#" onclick="logout()" id="logout-btn">
+            <span class="nav-icon">🚪</span>
+            Logout
+          </a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Manage Students</h1>
+      <p>Add, edit, and manage student accounts and information</p>
+      <div class="page-actions">
+        <button class="btn btn-primary" onclick="openModal('studentModal')">+ Add New Student</button>
+      </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="search-filter-bar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="studentSearch" placeholder="Search students..." onkeyup="searchTable('studentSearch', 'student-table')">
+      </div>
+    </div>
+
+    <!-- Students Table -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">All Students</h2>
+      </div>
+      <div class="card-body">
+        <div class="table-container">
+          <table id="student-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Course</th>
+                <th>Batch</th>
+                <th>Semester</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Data loaded by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add/Edit Student Modal -->
+  <div id="studentModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Add New Student</h2>
+        <button class="modal-close" onclick="closeModal('studentModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="student-form" onsubmit="addStudent(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="studentName">Full Name *</label>
+              <input type="text" class="form-control" id="studentName" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="studentEmail">Email *</label>
+              <input type="email" class="form-control" id="studentEmail" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="studentCourse">Course *</label>
+              <input type="text" class="form-control" id="studentCourse" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="studentBatch">Batch *</label>
+              <input type="text" class="form-control" id="studentBatch" placeholder="e.g., 2024" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="studentSemester">Semester *</label>
+              <select class="form-control" id="studentSemester" required>
+                <option value="">Select Semester</option>
+                <option value="1">1st Semester</option>
+                <option value="2">2nd Semester</option>
+                <option value="3">3rd Semester</option>
+                <option value="4">4th Semester</option>
+                <option value="5">5th Semester</option>
+                <option value="6">6th Semester</option>
+                <option value="7">7th Semester</option>
+                <option value="8">8th Semester</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="studentPhone">Phone Number</label>
+              <input type="tel" class="form-control" id="studentPhone">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="studentStatus">Status *</label>
+            <select class="form-control" id="studentStatus" required>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('studentModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Student</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      loadStudents();
+    });
+  </script>
+</body>
+</html>

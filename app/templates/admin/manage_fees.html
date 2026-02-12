@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Fees - College Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>College Portal</h2>
+      <p>Admin Panel</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="admin_dashboard.html">
+            <span class="nav-icon">📊</span>
+            Dashboard
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Management</div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_students.html">
+            <span class="nav-icon">👨‍🎓</span>
+            Manage Students
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_teachers.html">
+            <span class="nav-icon">👨‍🏫</span>
+            Manage Teachers
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_courses.html">
+            <span class="nav-icon">📚</span>
+            Manage Courses
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_assignments.html">
+            <span class="nav-icon">📝</span>
+            Manage Assignments
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_results.html">
+            <span class="nav-icon">🎯</span>
+            Manage Results
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_attendance.html">
+            <span class="nav-icon">✓</span>
+            Manage Attendance
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_noticeboard.html">
+            <span class="nav-icon">📢</span>
+            Manage Notices
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_fees.html">
+            <span class="nav-icon">💰</span>
+            Manage Fees
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Account</div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="profile.html">
+            <span class="nav-icon">👤</span>
+            Profile
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="#" onclick="logout()" id="logout-btn">
+            <span class="nav-icon">🚪</span>
+            Logout
+          </a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Manage Fees</h1>
+      <p>View and update student fee payments</p>
+    </div>
+
+    <!-- Fee Summary Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-value">₹1,43,000</div>
+        <div class="stat-label">Total Fees Collected</div>
+        <div class="stat-change positive">↑ 15% this month</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-value">₹68,000</div>
+        <div class="stat-label">Pending Fees</div>
+        <div class="stat-change">2 students</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-value">1</div>
+        <div class="stat-label">Fully Paid</div>
+        <div class="stat-change positive">33% completion</div>
+      </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="search-filter-bar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="feeSearch" placeholder="Search students..." onkeyup="searchTable('feeSearch', 'fee-status')">
+      </div>
+      <div class="filter-group">
+        <select class="form-control" style="width: auto;">
+          <option>All Courses</option>
+          <option>Computer Science</option>
+          <option>Mathematics</option>
+          <option>Physics</option>
+        </select>
+        <select class="form-control" style="width: auto;">
+          <option>All Status</option>
+          <option>Paid</option>
+          <option>Partial</option>
+          <option>Unpaid</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Fee Status Table -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Student Fee Status</h2>
+      </div>
+      <div class="card-body">
+        <div class="table-container">
+          <table id="fee-status">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Student Name</th>
+                <th>Course</th>
+                <th>Semester</th>
+                <th>Total Fees</th>
+                <th>Paid Amount</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Data loaded by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fee History -->
+    <div class="card" id="fee-history">
+      <div class="card-header">
+        <h2 class="card-title">Recent Payment History</h2>
+      </div>
+      <div class="card-body">
+        <ul class="activity-feed">
+          <li class="activity-item">
+            <div class="activity-title">Jane Smith - Payment received</div>
+            <div class="activity-time">₹45,000 • Feb 10, 2026</div>
+          </li>
+          <li class="activity-item">
+            <div class="activity-title">John Doe - Partial payment</div>
+            <div class="activity-time">₹30,000 • Feb 5, 2026</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <!-- Update Fee Modal -->
+  <div id="feeModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Update Fee Payment</h2>
+        <button class="modal-close" onclick="closeModal('feeModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="fee-update-form" onsubmit="saveFeeUpdate(event)">
+          <div class="form-group">
+            <label class="form-label" for="feeStudentName">Student Name</label>
+            <input type="text" class="form-control" id="feeStudentName" readonly>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="feeTotalAmount">Total Fees *</label>
+              <input type="number" class="form-control" id="feeTotalAmount" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="feePaidAmount">Paid Amount *</label>
+              <input type="number" class="form-control" id="feePaidAmount" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="feeStatus">Payment Status *</label>
+            <select class="form-control" id="feeStatus" required>
+              <option value="Paid">Paid</option>
+              <option value="Partial">Partial Payment</option>
+              <option value="Unpaid">Unpaid</option>
+            </select>
+          </div>
+
+          <div class="alert alert-info">
+            <span>ℹ️</span>
+            <span>Remaining balance will be calculated automatically based on total fees and paid amount.</span>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('feeModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Update Fee</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      loadFees();
+    });
+  </script>
+</body>
+</html>

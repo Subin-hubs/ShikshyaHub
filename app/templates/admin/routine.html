@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Routine - College Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .routine-grid {
+      display: grid;
+      grid-template-columns: auto repeat(6, 1fr);
+      gap: 1px;
+      background: var(--border-color);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .routine-cell {
+      background: var(--white);
+      padding: 16px;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .routine-header {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+      color: var(--white);
+      font-weight: 700;
+      text-align: center;
+      padding: 16px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .routine-time {
+      background: var(--bg-light);
+      font-weight: 600;
+      color: var(--primary-dark);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .class-slot {
+      background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+      border-left: 4px solid var(--primary-light);
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      margin: 4px 0;
+    }
+
+    .class-slot:hover {
+      transform: translateX(4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .class-name {
+      font-weight: 600;
+      color: var(--primary-dark);
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .class-teacher {
+      font-size: 12px;
+      color: var(--text-gray);
+    }
+
+    .class-room {
+      font-size: 11px;
+      color: var(--text-gray);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .empty-slot {
+      color: var(--text-gray);
+      font-size: 13px;
+      text-align: center;
+      font-style: italic;
+    }
+
+    .break-slot {
+      background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+      border-left: 4px solid var(--warning);
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 600;
+      color: #E65100;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .filter-tab {
+      padding: 10px 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--white);
+      cursor: pointer;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .filter-tab:hover {
+      border-color: var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    .filter-tab.active {
+      background: var(--primary-dark);
+      color: var(--white);
+      border-color: var(--primary-dark);
+    }
+
+    @media (max-width: 1200px) {
+      .routine-grid {
+        overflow-x: auto;
+      }
+      
+      .routine-grid > * {
+        min-width: 120px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>College Portal</h2>
+      <p>Admin Panel</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <div class="nav-item">
+          <a href="admin_dashboard.html">
+            <span class="nav-icon">📊</span>
+            Dashboard
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Management</div>
+        <div class="nav-item">
+          <a href="manage_students.html">
+            <span class="nav-icon">👨‍🎓</span>
+            Manage Students
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_teachers.html">
+            <span class="nav-icon">👨‍🏫</span>
+            Manage Teachers
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_courses.html">
+            <span class="nav-icon">📚</span>
+            Manage Courses
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_assignments.html">
+            <span class="nav-icon">📝</span>
+            Manage Assignments
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_results.html">
+            <span class="nav-icon">🎯</span>
+            Manage Results
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_attendance.html">
+            <span class="nav-icon">✓</span>
+            Manage Attendance
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_noticeboard.html">
+            <span class="nav-icon">📢</span>
+            Manage Notices
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_fees.html">
+            <span class="nav-icon">💰</span>
+            Manage Fees
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Account</div>
+        <div class="nav-item">
+          <a href="profile.html">
+            <span class="nav-icon">👤</span>
+            Profile
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="#" onclick="logout()" id="logout-btn">
+            <span class="nav-icon">🚪</span>
+            Logout
+          </a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Class Routine</h1>
+      <p>View and manage class schedules and timetables</p>
+      <div class="page-actions">
+        <button class="btn btn-primary" onclick="openModal('routineModal')">+ Add Class Schedule</button>
+        <button class="btn btn-secondary" onclick="printRoutine()">🖨️ Print Routine</button>
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <button class="filter-tab active" onclick="filterRoutine('all')">All Classes</button>
+      <button class="filter-tab" onclick="filterRoutine('Computer Science')">Computer Science</button>
+      <button class="filter-tab" onclick="filterRoutine('Mathematics')">Mathematics</button>
+      <button class="filter-tab" onclick="filterRoutine('Physics')">Physics</button>
+    </div>
+
+    <!-- Weekly Routine Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Weekly Class Schedule</h2>
+        <select class="form-control" style="width: auto;" onchange="changeSemester(this.value)">
+          <option value="all">All Semesters</option>
+          <option value="1">Semester 1</option>
+          <option value="2">Semester 2</option>
+          <option value="3">Semester 3</option>
+          <option value="4">Semester 4</option>
+        </select>
+      </div>
+      <div class="card-body">
+        <div id="routine-container">
+          <!-- Routine grid will be loaded here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Legend</h2>
+      </div>
+      <div class="card-body">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); border-left: 4px solid var(--primary-light); border-radius: 6px;"></div>
+            <span>Regular Class</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); border-left: 4px solid var(--warning); border-radius: 6px;"></div>
+            <span>Break / Lunch</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; background: var(--white); border: 2px dashed var(--border-color); border-radius: 6px;"></div>
+            <span>No Class</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add/Edit Routine Modal -->
+  <div id="routineModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Add Class Schedule</h2>
+        <button class="modal-close" onclick="closeModal('routineModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="routine-form" onsubmit="addRoutine(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="routineDay">Day *</label>
+              <select class="form-control" id="routineDay" required>
+                <option value="">Select Day</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="routineTime">Time Slot *</label>
+              <select class="form-control" id="routineTime" required>
+                <option value="">Select Time</option>
+                <option value="9:00-10:00">9:00 AM - 10:00 AM</option>
+                <option value="10:00-11:00">10:00 AM - 11:00 AM</option>
+                <option value="11:00-12:00">11:00 AM - 12:00 PM</option>
+                <option value="12:00-1:00">12:00 PM - 1:00 PM (Lunch)</option>
+                <option value="1:00-2:00">1:00 PM - 2:00 PM</option>
+                <option value="2:00-3:00">2:00 PM - 3:00 PM</option>
+                <option value="3:00-4:00">3:00 PM - 4:00 PM</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="routineCourse">Course *</label>
+              <select class="form-control" id="routineCourse" required>
+                <option value="">Select Course</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="routineTeacher">Teacher *</label>
+              <select class="form-control" id="routineTeacher" required>
+                <option value="">Select Teacher</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="routineRoom">Room Number *</label>
+              <input type="text" class="form-control" id="routineRoom" placeholder="e.g., Room 101" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="routineType">Type *</label>
+              <select class="form-control" id="routineType" required>
+                <option value="Lecture">Lecture</option>
+                <option value="Lab">Lab</option>
+                <option value="Tutorial">Tutorial</option>
+                <option value="Break">Break/Lunch</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('routineModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Schedule</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script>
+    // Initialize routine data
+    function initializeRoutineData() {
+      if (!localStorage.getItem('routine')) {
+        const sampleRoutine = [
+          { id: 1, day: 'Monday', time: '9:00-10:00', course: 'Computer Science', teacher: 'Dr. Sarah Williams', room: 'Room 101', type: 'Lecture' },
+          { id: 2, day: 'Monday', time: '10:00-11:00', course: 'Mathematics', teacher: 'Prof. Robert Brown', room: 'Room 201', type: 'Lecture' },
+          { id: 3, day: 'Monday', time: '11:00-12:00', course: 'Physics', teacher: 'Dr. James Wilson', room: 'Lab 1', type: 'Lab' },
+          { id: 4, day: 'Monday', time: '12:00-1:00', course: 'Lunch Break', teacher: '', room: '', type: 'Break' },
+          { id: 5, day: 'Monday', time: '1:00-2:00', course: 'Computer Science', teacher: 'Dr. Sarah Williams', room: 'Lab 2', type: 'Lab' },
+          
+          { id: 6, day: 'Tuesday', time: '9:00-10:00', course: 'Mathematics', teacher: 'Prof. Robert Brown', room: 'Room 201', type: 'Lecture' },
+          { id: 7, day: 'Tuesday', time: '10:00-11:00', course: 'Physics', teacher: 'Dr. James Wilson', room: 'Room 301', type: 'Lecture' },
+          { id: 8, day: 'Tuesday', time: '11:00-12:00', course: 'Computer Science', teacher: 'Dr. Sarah Williams', room: 'Room 101', type: 'Tutorial' },
+          { id: 9, day: 'Tuesday', time: '12:00-1:00', course: 'Lunch Break', teacher: '', room: '', type: 'Break' },
+          { id: 10, day: 'Tuesday', time: '1:00-2:00', course: 'Mathematics', teacher: 'Prof. Robert Brown', room: 'Room 201', type: 'Tutorial' },
+          
+          { id: 11, day: 'Wednesday', time: '9:00-10:00', course: 'Physics', teacher: 'Dr. James Wilson', room: 'Room 301', type: 'Lecture' },
+          { id: 12, day: 'Wednesday', time: '10:00-11:00', course: 'Computer Science', teacher: 'Dr. Sarah Williams', room: 'Room 101', type: 'Lecture' },
+          { id: 13, day: 'Wednesday', time: '11:00-12:00', course: 'Mathematics', teacher: 'Prof. Robert Brown', room: 'Room 201', type: 'Lecture' },
+          { id: 14, day: 'Wednesday', time: '12:00-1:00', course: 'Lunch Break', teacher: '', room: '', type: 'Break' },
+          
+          { id: 15, day: 'Thursday', time: '9:00-10:00', course: 'Computer Science', teacher: 'Dr. Sarah Williams', room: 'Room 101', type: 'Lecture' },
+          { id: 16, day: 'Thursday', time: '10:00-11:00', course: 'Mathematics', teacher: 'Prof. Robert Brown', room: 'Room 201', type: 'Lecture' },
+          { id: 17, day: 'Thursday', time: '11:00-12:00', course: 'Physics', teacher: 'Dr. James Wilson', room: 'Lab 1', type: 'Lab' },
+          { id: 18, day: 'Thursday', time: '12:00-1:00', course: 'Lunch Break', teacher: '', room: '', type: 'Break' },
+          { id: 19, day: 'Thursday', time: '1:00-2:00', course: 'Mathematics', teacher: 'Prof. Robert Brown', room: 'Room 201', type: 'Tutorial' },
+          
+          { id: 20, day: 'Friday', time: '9:00-10:00', course: 'Physics', teacher: 'Dr. James Wilson', room: 'Room 301', type: 'Lecture' },
+          { id: 21, day: 'Friday', time: '10:00-11:00', course: 'Computer Science', teacher: 'Dr. Sarah Williams', room: 'Room 101', type: 'Lecture' },
+          { id: 22, day: 'Friday', time: '11:00-12:00', course: 'Mathematics', teacher: 'Prof. Robert Brown', room: 'Room 201', type: 'Lecture' },
+          { id: 23, day: 'Friday', time: '12:00-1:00', course: 'Lunch Break', teacher: '', room: '', type: 'Break' },
+          
+          { id: 24, day: 'Saturday', time: '9:00-10:00', course: 'Computer Science', teacher: 'Dr. Sarah Williams', room: 'Lab 2', type: 'Lab' },
+          { id: 25, day: 'Saturday', time: '10:00-11:00', course: 'Physics', teacher: 'Dr. James Wilson', room: 'Lab 1', type: 'Lab' },
+        ];
+        
+        localStorage.setItem('routine', JSON.stringify(sampleRoutine));
+      }
+    }
+
+    function loadRoutine() {
+      const routine = getFromStorage('routine');
+      const container = document.getElementById('routine-container');
+      
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const timeSlots = ['9:00-10:00', '10:00-11:00', '11:00-12:00', '12:00-1:00', '1:00-2:00', '2:00-3:00', '3:00-4:00'];
+      
+      let html = '<div class="routine-grid">';
+      
+      // Header row
+      html += '<div class="routine-header">Time</div>';
+      days.forEach(day => {
+        html += `<div class="routine-header">${day}</div>`;
+      });
+      
+      // Time slots
+      timeSlots.forEach(time => {
+        html += `<div class="routine-cell routine-time">${time.replace('-', ' - ')}</div>`;
+        
+        days.forEach(day => {
+          const slot = routine.find(r => r.day === day && r.time === time);
+          
+          if (slot) {
+            if (slot.type === 'Break') {
+              html += `<div class="routine-cell">
+                <div class="break-slot">🍽️ ${slot.course}</div>
+              </div>`;
+            } else {
+              html += `<div class="routine-cell">
+                <div class="class-slot" onclick="editRoutine(${slot.id})">
+                  <div class="class-name">${slot.course}</div>
+                  <div class="class-teacher">👨‍🏫 ${slot.teacher}</div>
+                  <div class="class-room">📍 ${slot.room} • ${slot.type}</div>
+                </div>
+              </div>`;
+            }
+          } else {
+            html += `<div class="routine-cell"><div class="empty-slot">No class</div></div>`;
+          }
+        });
+      });
+      
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    function addRoutine(event) {
+      event.preventDefault();
+      const form = event.target;
+      const routine = getFromStorage('routine');
+
+      const newSchedule = {
+        id: generateId(routine),
+        day: form.routineDay.value,
+        time: form.routineTime.value,
+        course: form.routineCourse.value,
+        teacher: form.routineTeacher.value,
+        room: form.routineRoom.value,
+        type: form.routineType.value
+      };
+
+      routine.push(newSchedule);
+      saveToStorage('routine', routine);
+      loadRoutine();
+      form.reset();
+      closeModal('routineModal');
+      showAlert('Class schedule added successfully!');
+    }
+
+    function loadRoutineOptions() {
+      const courses = getFromStorage('courses');
+      const teachers = getFromStorage('teachers');
+      
+      const courseSelect = document.getElementById('routineCourse');
+      const teacherSelect = document.getElementById('routineTeacher');
+      
+      if (courseSelect) {
+        courseSelect.innerHTML = '<option value="">Select Course</option>' +
+          courses.map(course => `<option value="${course.name}">${course.name}</option>`).join('');
+      }
+      
+      if (teacherSelect) {
+        teacherSelect.innerHTML = '<option value="">Select Teacher</option>' +
+          teachers.map(teacher => `<option value="${teacher.name}">${teacher.name}</option>`).join('');
+      }
+    }
+
+    function editRoutine(id) {
+      const routine = getFromStorage('routine');
+      const schedule = routine.find(r => r.id === id);
+      
+      if (schedule && schedule.type !== 'Break') {
+        loadRoutineOptions();
+        document.getElementById('routineDay').value = schedule.day;
+        document.getElementById('routineTime').value = schedule.time;
+        document.getElementById('routineCourse').value = schedule.course;
+        document.getElementById('routineTeacher').value = schedule.teacher;
+        document.getElementById('routineRoom').value = schedule.room;
+        document.getElementById('routineType').value = schedule.type;
+        
+        openModal('routineModal');
+      }
+    }
+
+    function filterRoutine(course) {
+      // Update active tab
+      document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      // This is a simple filter - in production you'd filter the data
+      loadRoutine();
+    }
+
+    function changeSemester(semester) {
+      // Filter by semester - in production you'd filter the data
+      loadRoutine();
+    }
+
+    function printRoutine() {
+      window.print();
+    }
+
+    // Load routine on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeRoutineData();
+      loadRoutine();
+      loadRoutineOptions();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Results - College Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>College Portal</h2>
+      <p>Admin Panel</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="admin_dashboard.html">
+            <span class="nav-icon">📊</span>
+            Dashboard
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Management</div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_students.html">
+            <span class="nav-icon">👨‍🎓</span>
+            Manage Students
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_teachers.html">
+            <span class="nav-icon">👨‍🏫</span>
+            Manage Teachers
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_courses.html">
+            <span class="nav-icon">📚</span>
+            Manage Courses
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_assignments.html">
+            <span class="nav-icon">📝</span>
+            Manage Assignments
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_results.html">
+            <span class="nav-icon">🎯</span>
+            Manage Results
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_attendance.html">
+            <span class="nav-icon">✓</span>
+            Manage Attendance
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_noticeboard.html">
+            <span class="nav-icon">📢</span>
+            Manage Notices
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="manage_fees.html">
+            <span class="nav-icon">💰</span>
+            Manage Fees
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Account</div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="profile.html">
+            <span class="nav-icon">👤</span>
+            Profile
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="routine.html">
+            <span class="nav-icon">📅</span>
+            Class Routine
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="#" onclick="logout()" id="logout-btn">
+            <span class="nav-icon">🚪</span>
+            Logout
+          </a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Manage Results</h1>
+      <p>Enter and manage student grades and results</p>
+      <div class="page-actions">
+        <button class="btn btn-primary" onclick="openModal('resultModal'); loadStudentOptions(); loadCourseOptions()">+ Add New Result</button>
+      </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="search-filter-bar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="resultSearch" placeholder="Search results..." onkeyup="searchTable('resultSearch', 'results-table')">
+      </div>
+    </div>
+
+    <!-- Results Table -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">All Results</h2>
+      </div>
+      <div class="card-body">
+        <div class="table-container">
+          <table id="results-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Student Name</th>
+                <th>Course</th>
+                <th>Marks</th>
+                <th>Grade</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Data loaded by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add/Edit Result Modal -->
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Add New Result</h2>
+        <button class="modal-close" onclick="closeModal('resultModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="results-form" onsubmit="addResult(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="resultStudent">Student *</label>
+              <select class="form-control" id="resultStudent" required>
+                <option value="">Select Student</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="resultCourse">Course *</label>
+              <select class="form-control" id="resultCourse" required>
+                <option value="">Select Course</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="resultMarks">Marks Obtained *</label>
+              <input type="number" class="form-control" id="resultMarks" min="0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="resultMaxMarks">Maximum Marks *</label>
+              <input type="number" class="form-control" id="resultMaxMarks" min="1" value="100" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="resultGrade">Grade *</label>
+            <select class="form-control" id="resultGrade" required>
+              <option value="">Select Grade</option>
+              <option value="A+">A+ (90-100)</option>
+              <option value="A">A (80-89)</option>
+              <option value="B+">B+ (70-79)</option>
+              <option value="B">B (60-69)</option>
+              <option value="C">C (50-59)</option>
+              <option value="D">D (40-49)</option>
+              <option value="F">F (Below 40)</option>
+            </select>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('resultModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Result</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      loadResults();
+    });
+  </script>
+</body>
+</html>
