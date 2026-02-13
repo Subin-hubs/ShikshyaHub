@@ -1,86 +1,172 @@
-from datetime import datetime
-from app import db, login_manager
+from datetime import datetime, date
+
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from app import db, login_manager
+
+
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(user_id: str):
+    """Flask-Login hook to load a user from the database."""
     return User.query.get(int(user_id))
 
+
 class User(db.Model, UserMixin):
+    """Authentication user for all roles.
+
+    Only admins can create new users. Students and teachers can only log in.
+    """
+
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128))
-    role = db.Column(db.String(20), nullable=False) # 'admin', 'teacher', 'student'
+    username = db.Column(db.String(64), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False)
+    role = db.Column(
+        db.String(20), nullable=False
+    )  # 'admin', 'teacher', 'student'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # RELATIONSHIPS: These allow you to access profile info easily
-    # uselist=False makes it a 1-to-1 relationship
-    # cascade="all, delete-orphan" means if User is deleted, these are deleted too
-    student_profile = db.relationship('Student', backref='user_account', cascade='all, delete-orphan', uselist=False)
-    teacher_profile = db.relationship('Teacher', backref='user_account', cascade='all, delete-orphan', uselist=False)
+    # One-to-one profiles
+    student_profile = db.relationship(
+        "Student",
+        backref="user_account",
+        cascade="all, delete-orphan",
+        uselist=False,
+    )
+    teacher_profile = db.relationship(
+        "Teacher",
+        backref="user_account",
+        cascade="all, delete-orphan",
+        uselist=False,
+    )
 
-    def set_password(self, password):
+    def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password)
 
-    def check_password(self, password):
+    def check_password(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
 
+
 class Student(db.Model):
+    """Student profile linked to a User with role='student'."""
+
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    student_id_no = db.Column(db.String(20), unique=True, nullable=False)
-    year = db.Column(db.String(10))
-    semester = db.Column(db.String(10))
-    
-    # Links to other data
-    enrollments = db.relationship('Enrollment', backref='student', cascade='all, delete-orphan')
-    attendance = db.relationship('Attendance', backref='student', cascade='all, delete-orphan')
-    grades = db.relationship('Grade', backref='student', cascade='all, delete-orphan')
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    full_name = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    class_name = db.Column(db.String(50), nullable=False)  # e.g. "BSc CS 1st Year"
+
+    # Relationships
+    results = db.relationship(
+        "Result", backref="student", cascade="all, delete-orphan"
+    )
+    attendance_records = db.relationship(
+        "Attendance", backref="student", cascade="all, delete-orphan"
+    )
+    fees = db.relationship(
+        "Fee", backref="student", cascade="all, delete-orphan", uselist=False
+    )
+
 
 class Teacher(db.Model):
+    """Teacher profile linked to a User with role='teacher'."""
+
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    employee_id = db.Column(db.String(20), unique=True, nullable=False)
-    department = db.Column(db.String(100))
-    
-    # A teacher can teach many courses
-    courses = db.relationship('Course', backref='instructor', lazy=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    full_name = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    subject = db.Column(db.String(120), nullable=False)
+
+    courses = db.relationship("Course", backref="teacher", lazy=True)
+
 
 class Course(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    code = db.Column(db.String(20), unique=True, nullable=False)
-    teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'))
-    
-    enrollments = db.relationship('Enrollment', backref='course', cascade='all, delete-orphan')
-    assignments = db.relationship('Assignment', backref='course', cascade='all, delete-orphan')
-    attendance = db.relationship('Attendance', backref='course', cascade='all, delete-orphan')
+    """Course taught by a teacher for a particular class."""
 
-class Enrollment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
-    date = db.Column(db.DateTime, default=datetime.utcnow)
+    name = db.Column(db.String(120), nullable=False)
+    class_name = db.Column(
+        db.String(50), nullable=False
+    )  # link to Student.class_name
+    teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"), nullable=True)
 
-class Attendance(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
-    date = db.Column(db.Date, default=datetime.utcnow)
-    status = db.Column(db.String(10)) # Present/Absent
+    assignments = db.relationship(
+        "Assignment", backref="course", cascade="all, delete-orphan"
+    )
+    results = db.relationship(
+        "Result", backref="course", cascade="all, delete-orphan"
+    )
+    attendance_records = db.relationship(
+        "Attendance", backref="course", cascade="all, delete-orphan"
+    )
+
 
 class Assignment(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
-    title = db.Column(db.String(200), nullable=False)
-    due_date = db.Column(db.DateTime)
-    file_path = db.Column(db.String(200))
+    """Assignments given in a course."""
 
-class Grade(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
-    marks = db.Column(db.Float)
-    total = db.Column(db.Float)
+    course_id = db.Column(db.Integer, db.ForeignKey("course.id"), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    file_path = db.Column(db.String(255), nullable=True)
+    due_date = db.Column(db.DateTime, nullable=True)
+
+
+class Result(db.Model):
+    """Marks obtained by a student in a course."""
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
+    course_id = db.Column(db.Integer, db.ForeignKey("course.id"), nullable=False)
+    marks = db.Column(db.Float, nullable=False)
+
+
+class Attendance(db.Model):
+    """Attendance record for a student on a particular date (optionally per course)."""
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
+    course_id = db.Column(db.Integer, db.ForeignKey("course.id"), nullable=True)
+    date = db.Column(db.Date, default=date.today, nullable=False)
+    status = db.Column(
+        db.String(10), nullable=False
+    )  # 'Present' or 'Absent'
+
+
+class Routine(db.Model):
+    """Class routine for a given day."""
+
+    id = db.Column(db.Integer, primary_key=True)
+    class_name = db.Column(db.String(50), nullable=False)
+    day = db.Column(db.String(20), nullable=False)  # e.g. "Monday"
+    subject = db.Column(db.String(120), nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"), nullable=True)
+    time = db.Column(db.String(50), nullable=False)  # e.g. "09:00 AM - 10:00 AM"
+
+
+class Noticeboard(db.Model):
+    """Notices posted by admins."""
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    posted_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Fee(db.Model):
+    """Fee record for a student."""
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
+    total_amount = db.Column(db.Float, nullable=False)
+    paid_amount = db.Column(db.Float, nullable=False, default=0.0)
+    due_amount = db.Column(db.Float, nullable=False, default=0.0)
+
+    @property
+    def status(self) -> str:
+        if self.due_amount <= 0:
+            return "Paid"
+        if self.paid_amount > 0:
+            return "Partial"
+        return "Unpaid"
