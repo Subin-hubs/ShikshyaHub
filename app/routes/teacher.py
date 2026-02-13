@@ -25,10 +25,10 @@ def dashboard():
     
     teacher_info = get_teacher_info()
     if teacher_info is None:
-        return render_template('teacher/dashboard.html', teacher=None, courses=[])
+        return render_template('teacher/teacher_dashboard.html', teacher=None, courses=[])
     
     my_courses = Course.query.filter_by(teacher_id=teacher_info.id).all()
-    return render_template('teacher/dashboard.html', teacher=teacher_info, courses=my_courses)
+    return render_template('teacher/teacher_dashboard.html', teacher=teacher_info, courses=my_courses)
 
 @teacher.route('/teacher/courses')
 @login_required
@@ -42,7 +42,7 @@ def courses():
         return redirect(url_for('teacher.dashboard'))
     
     my_courses = Course.query.filter_by(teacher_id=teacher_info.id).all()
-    return render_template('teacher/courses.html', courses=my_courses)
+    return render_template('teacher/course.html', courses=my_courses)
 
 @teacher.route('/teacher/students')
 @login_required
@@ -61,7 +61,7 @@ def students():
     enrollments = Enrollment.query.filter(Enrollment.course_id.in_(course_ids)).all()
     students_data = [e.student_id for e in enrollments]
     
-    return render_template('teacher/students.html', enrollments=enrollments, courses=my_courses)
+    return render_template('teacher/course.html', enrollments=enrollments, courses=my_courses)
 
 @teacher.route('/teacher/attendance')
 @login_required
@@ -106,7 +106,7 @@ def grades():
         return redirect(url_for('teacher.dashboard'))
     
     my_courses = Course.query.filter_by(teacher_id=teacher_info.id).all()
-    return render_template('teacher/grades.html', courses=my_courses)
+    return render_template('teacher/results.html', courses=my_courses)
 
 # ==================== TEACHER API ENDPOINTS ====================
 

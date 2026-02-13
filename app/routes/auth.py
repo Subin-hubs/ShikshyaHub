@@ -39,7 +39,7 @@ def login():
         else:
             return redirect(url_for('student.dashboard'))
 
-    return render_template('auth/login.html')
+    return redirect(url_for('main.index'))
 
 @auth.route('/register', methods=['POST'])
 def register():

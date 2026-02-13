@@ -18,7 +18,7 @@ def check_admin():
 def dashboard():
     if not check_admin():
         flash('Access denied. Admin privileges required.', 'danger')
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.index'))
     
     stats = {
         'users': User.query.count(),
@@ -26,52 +26,52 @@ def dashboard():
         'teachers': Teacher.query.count(),
         'courses': Course.query.count()
     }
-    return render_template('admin/dashboard.html', stats=stats)
+    return render_template('admin/admin_dashboard.html', stats=stats)
 
 @admin.route('/admin/manage-users')
 @login_required
 def manage_users():
     if not check_admin():
         flash('Access denied.', 'danger')
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.index'))
     
     all_users = User.query.all()
-    return render_template('admin/manage_users.html', users=all_users)
+    return render_template('admin/manage_students.html', users=all_users)
 
 @admin.route('/admin/courses')
 @login_required
 def courses():
     if not check_admin():
         flash('Access denied.', 'danger')
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.index'))
     
     all_courses = Course.query.all()
     all_teachers = Teacher.query.all()
-    return render_template('admin/courses.html', courses=all_courses, teachers=all_teachers)
+    return render_template('admin/manage_courses.html', courses=all_courses, teachers=all_teachers)
 
 @admin.route('/admin/attendance')
 @login_required
 def attendance():
     if not check_admin():
         flash('Access denied.', 'danger')
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.index'))
     
     all_attendance = Attendance.query.all()
-    return render_template('admin/attendance.html', attendance=all_attendance)
+    return render_template('admin/manage_attendance.html', attendance=all_attendance)
 
 @admin.route('/admin/reports')
 @login_required
 def reports():
     if not check_admin():
         flash('Access denied.', 'danger')
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.index'))
     
     students_count = Student.query.count()
     teachers_count = Teacher.query.count()
     courses_count = Course.query.count()
     total_enrollments = Enrollment.query.count()
     
-    return render_template('admin/reports.html', 
+    return render_template('admin/manage_results.html', 
                          students_count=students_count,
                          teachers_count=teachers_count,
                          courses_count=courses_count,
@@ -223,30 +223,6 @@ def add_course():
         db.session.commit()
         
         return jsonify({'success': True, 'message': f'Course "{name}" created successfully'})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'success': False, 'message': str(e)}), 500
-    """Add new course"""
-    if not check_admin():
-        return jsonify({'success': False, 'message': 'Access denied'}), 403
-    
-    try:
-        data = request.get_json()
-        name = data.get('name', '').strip()
-        code = data.get('code', '').strip()
-        teacher_id = data.get('teacher_id')
-        
-        if not name or not code:
-            return jsonify({'success': False, 'message': 'Course name and code are required'}), 400
-        
-        if Course.query.filter_by(code=code).first():
-            return jsonify({'success': False, 'message': 'Course code already exists'}), 400
-        
-        new_course = Course(name=name, code=code, teacher_id=teacher_id)
-        db.session.add(new_course)
-        db.session.commit()
-        
-        return jsonify({'success': True, 'message': f'Course "{name}" created successfully', 'course_id': new_course.id})
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500

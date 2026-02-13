@@ -84,3 +84,12 @@ class Grade(db.Model):
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
     marks = db.Column(db.Float)
     total = db.Column(db.Float)
+
+class FeePayment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    method = db.Column(db.String(30), default='ESEWA')
+    status = db.Column(db.String(20), default='PENDING')  # PENDING/PAID/FAILED
+    transaction_ref = db.Column(db.String(120), unique=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

@@ -40,7 +40,7 @@ def courses():
     enrollments = Enrollment.query.filter_by(student_id=student_info.id).all()
     return render_template('student/courses.html', enrollments=enrollments)
 
-@student.route('attendance')
+@student.route('/attendance')
 @login_required
 def attendance():
     student_info = get_student_info()
@@ -49,7 +49,7 @@ def attendance():
     attendance_records = Attendance.query.filter_by(student_id=student_info.id).all()
     return render_template('student/attendance.html', attendance=attendance_records)
 
-@student.route('grades')
+@student.route('/grades')
 @login_required
 def grades():
     if current_user.role != 'student':
@@ -73,9 +73,9 @@ def grades():
     
     gpa = round(total_marks / total_courses, 2) if total_courses > 0 else 0
     
-    return render_template('student/grades.html', grades=grades_data, gpa=gpa, total_courses=total_courses)
+    return render_template('student/results.html', grades=grades_data, gpa=gpa, total_courses=total_courses)
 
-@student.route('notices')
+@student.route('/notices')
 @login_required
 def notices():
     if current_user.role != 'student':
@@ -84,9 +84,9 @@ def notices():
     
     # Placeholder - implement based on your Notice model
     notices_data = []
-    return render_template('student/notices.html', notices=notices_data)
+    return render_template('student/noticeboard.html', notices=notices_data)
 
-@student.route('assignments')
+@student.route('/assignments')
 @login_required
 def assignments():
     if current_user.role != 'student':
@@ -104,9 +104,71 @@ def assignments():
     
     return render_template('student/assignments.html', assignments=assignments_data)
 
+
+
+@student.route('/fees')
+@login_required
+def fees():
+    if current_user.role != 'student':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main.index'))
+
+    student_info = get_student_info()
+    if not student_info:
+        return redirect(url_for('student.dashboard'))
+
+    from app.models import FeePayment
+    payments = FeePayment.query.filter_by(student_id=student_info.id).order_by(FeePayment.created_at.desc()).all()
+    total_paid = sum(p.amount for p in payments if p.status == 'PAID')
+    return render_template('student/fees.html', payments=payments, total_paid=total_paid)
+
+@student.route('/fees/esewa/pay', methods=['POST'])
+@login_required
+def esewa_pay():
+    if current_user.role != 'student':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main.index'))
+
+    student_info = get_student_info()
+    if not student_info:
+        return redirect(url_for('student.dashboard'))
+
+    amount = request.form.get('amount', type=float)
+    if not amount or amount <= 0:
+        flash('Invalid payment amount.', 'danger')
+        return redirect(url_for('student.fees'))
+
+    from app.models import FeePayment
+    payment = FeePayment(student_id=student_info.id, amount=amount, method='ESEWA', status='PENDING')
+    db.session.add(payment)
+    db.session.commit()
+
+    # Demo callback for now; replace with real eSewa verification in production.
+    return redirect(url_for('student.esewa_success', payment_id=payment.id))
+
+@student.route('/fees/esewa/success')
+@login_required
+def esewa_success():
+    payment_id = request.args.get('payment_id', type=int)
+    if payment_id:
+        from app.models import FeePayment
+        payment = FeePayment.query.get(payment_id)
+        if payment and payment.status != 'PAID':
+            payment.status = 'PAID'
+            payment.transaction_ref = f'ESEWA-{payment.id}'
+            db.session.commit()
+    flash('eSewa payment marked as successful.', 'success')
+    return redirect(url_for('student.fees'))
+
+@student.route('/fees/esewa/failure')
+@login_required
+def esewa_failure():
+    flash('eSewa payment failed/cancelled.', 'warning')
+    return redirect(url_for('student.fees'))
+
 # ==================== STUDENT API ENDPOINTS ====================
 
-@student.route('/student/api/enroll/<int:course_id>', methods=['POST'])
+@student.route('/api/enroll/<int:course_id>', methods=['POST'])
 @login_required
 def enroll_course(course_id):
     """Enroll student in a course"""
@@ -136,7 +198,7 @@ def enroll_course(course_id):
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500
 
-@student.route('/student/api/unenroll/<int:course_id>', methods=['POST'])
+@student.route('/api/unenroll/<int:course_id>', methods=['POST'])
 @login_required
 def unenroll_course(course_id):
     """Unenroll student from a course"""
@@ -164,7 +226,7 @@ def unenroll_course(course_id):
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500
 
-@student.route('/student/api/submit-assignment/<int:assignment_id>', methods=['POST'])
+@student.route('/api/submit-assignment/<int:assignment_id>', methods=['POST'])
 @login_required
 def submit_assignment(assignment_id):
     """Submit assignment"""

@@ -8,8 +8,8 @@ def index():
 
 @main.route('/about')
 def about():
-    return render_template('public/about.html')
+    return render_template('public/home.html')
 
 @main.route('/contact')
 def contact():
-    return render_template('public/contact.html')
+    return render_template('public/home.html')

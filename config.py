@@ -15,3 +15,9 @@ class Config:
     # This folder will store uploaded assignments
     UPLOAD_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'app/static/uploads')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # Max file size: 16MB
+
+    # eSewa configuration
+    ESEWA_MERCHANT_CODE = os.environ.get('ESEWA_MERCHANT_CODE', 'EPAYTEST')
+    ESEWA_BASE_URL = os.environ.get('ESEWA_BASE_URL', 'https://rc-epay.esewa.com.np/api/epay/main/v2/form')
+    ESEWA_SUCCESS_URL = os.environ.get('ESEWA_SUCCESS_URL', 'http://127.0.0.1:5000/student/fees/esewa/success')
+    ESEWA_FAILURE_URL = os.environ.get('ESEWA_FAILURE_URL', 'http://127.0.0.1:5000/student/fees/esewa/failure')
