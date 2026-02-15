@@ -45,9 +45,6 @@ instance/
 *~
 .DS_Store
 
-# Uploads (optional - remove if you want to track uploads)
-app/static/uploads/*
-!app/static/uploads/.gitkeep
 
 # Logs
 *.log
