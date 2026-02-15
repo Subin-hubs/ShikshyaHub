@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - FlavorHive{% endblock %}
+
+{% block content %}
+{% include 'includes/user_sidebar.html' %}
+
+<div class="main-content">
+    <div class="mb-4">
+        <h1 class="text-primary" style="font-weight: 700;">
+            Welcome back, {{ current_user.full_name }}! 
+            {% if current_user.is_premium %}
+                <span class="badge bg-warning">Premium Member</span>
+            {% endif %}
+        </h1>
+        <p class="text-muted">Here's what's happening with your recipes today.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card primary">
+                <div class="stat-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="stat-value">{{ recipes_count }}</div>
+                <div class="stat-label">My Recipes</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card secondary">
+                <div class="stat-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="stat-value">{{ comments_count }}</div>
+                <div class="stat-label">My Comments</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card accent">
+                <div class="stat-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="stat-value">{{ recommended_recipes|length }}</div>
+                <div class="stat-label">Recommended</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3"><i class="fas fa-bolt text-warning"></i> Quick Actions</h5>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="{{ url_for('user.upload_recipe') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i> Upload New Recipe
+                        </a>
+                        <a href="{{ url_for('user.explore') }}" class="btn btn-secondary">
+                            <i class="fas fa-search me-2"></i> Explore Recipes
+                        </a>
+                        {% if not current_user.is_premium %}
+                            <a href="{{ url_for('payment.premium') }}" class="btn btn-warning">
+                                <i class="fas fa-crown me-2"></i> Upgrade to Premium
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommended Recipes -->
+    <div class="mb-4">
+        <h3 class="mb-3"><i class="fas fa-star text-warning"></i> Recommended for You</h3>
+        {% if recommended_recipes %}
+            <div class="row g-4">
+                {% for recipe in recommended_recipes %}
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            {% if recipe.image %}
+                                <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" 
+                                     class="card-img-top" alt="{{ recipe.title }}">
+                            {% else %}
+                                <img src="https://via.placeholder.com/400x200?text={{ recipe.title }}" 
+                                     class="card-img-top" alt="{{ recipe.title }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ recipe.title }}</h5>
+                                <p class="card-text text-muted small">
+                                    <i class="fas fa-user me-1"></i> {{ recipe.author.full_name }}
+                                </p>
+                                <p class="card-text">{{ recipe.description[:100] }}...</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i> 
+                                        {{ recipe.cooking_time or 'N/A' }} min
+                                    </small>
+                                    <a href="{{ url_for('user.recipe_detail', recipe_id=recipe.id) }}" 
+                                       class="btn btn-sm btn-primary">View Recipe</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-utensils fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No recipes to show yet. Start exploring!</p>
+                <a href="{{ url_for('user.explore') }}" class="btn btn-primary">Explore Recipes</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Recipe - FlavorHive{% endblock %}
+
+{% block content %}
+{% include 'includes/user_sidebar.html' %}
+
+<div class="main-content">
+    <div class="mb-4">
+        <h1 class="text-primary" style="font-weight: 700;"><i class="fas fa-edit"></i> Edit Recipe</h1>
+        <p class="text-muted">Update your recipe details</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Recipe Title *</label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   value="{{ recipe.title }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description *</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" required>{{ recipe.description }}</textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="category" class="form-label">Category *</label>
+                                <select class="form-control" id="category" name="category" required>
+                                    <option value="breakfast" {% if recipe.category == 'breakfast' %}selected{% endif %}>Breakfast</option>
+                                    <option value="lunch" {% if recipe.category == 'lunch' %}selected{% endif %}>Lunch</option>
+                                    <option value="dinner" {% if recipe.category == 'dinner' %}selected{% endif %}>Dinner</option>
+                                    <option value="dessert" {% if recipe.category == 'dessert' %}selected{% endif %}>Dessert</option>
+                                    <option value="snack" {% if recipe.category == 'snack' %}selected{% endif %}>Snack</option>
+                                    <option value="beverage" {% if recipe.category == 'beverage' %}selected{% endif %}>Beverage</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="difficulty" class="form-label">Difficulty *</label>
+                                <select class="form-control" id="difficulty" name="difficulty" required>
+                                    <option value="easy" {% if recipe.difficulty == 'easy' %}selected{% endif %}>Easy</option>
+                                    <option value="medium" {% if recipe.difficulty == 'medium' %}selected{% endif %}>Medium</option>
+                                    <option value="hard" {% if recipe.difficulty == 'hard' %}selected{% endif %}>Hard</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="cooking_time" class="form-label">Cooking Time (min)</label>
+                                <input type="number" class="form-control" id="cooking_time" name="cooking_time" 
+                                       value="{{ recipe.cooking_time or '' }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="servings" class="form-label">Servings</label>
+                            <input type="number" class="form-control" id="servings" name="servings" 
+                                   value="{{ recipe.servings or '' }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ingredients" class="form-label">Ingredients *</label>
+                            <textarea class="form-control" id="ingredients" name="ingredients" rows="6" required>{{ recipe.ingredients }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="steps" class="form-label">Cooking Steps *</label>
+                            <textarea class="form-control" id="steps" name="steps" rows="8" required>{{ recipe.steps }}</textarea>
+                        </div>
+
+                        {% if recipe.image %}
+                            <div class="mb-3">
+                                <label class="form-label">Current Image</label>
+                                <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" 
+                                     alt="{{ recipe.title }}" class="img-fluid rounded" style="max-height: 200px;">
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-4">
+                            <label for="image" class="form-label">Update Recipe Image</label>
+                            <input type="file" class="form-control" id="image" name="image" 
+                                   accept="image/png, image/jpeg, image/jpg, image/gif, image/webp">
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            After editing, your recipe will need to be re-approved by the admin.
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i> Update Recipe
+                            </button>
+                            <a href="{{ url_for('user.my_recipes') }}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

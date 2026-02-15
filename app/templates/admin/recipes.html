@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Recipes - FlavorHive{% endblock %}
+
+{% block content %}
+{% include 'includes/admin_sidebar.html' %}
+
+<div class="main-content">
+    <div class="mb-4">
+        <h1 class="text-primary" style="font-weight: 700;"><i class="fas fa-book"></i> Manage Recipes</h1>
+        <p class="text-muted">Review, approve, and manage all recipes</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Filter Buttons -->
+    <div class="mb-4">
+        <div class="btn-group" role="group">
+            <a href="{{ url_for('admin.recipes', status='all') }}" 
+               class="btn btn-{% if status_filter == 'all' %}primary{% else %}outline-primary{% endif %}">
+                All Recipes
+            </a>
+            <a href="{{ url_for('admin.recipes', status='pending') }}" 
+               class="btn btn-{% if status_filter == 'pending' %}warning{% else %}outline-warning{% endif %}">
+                Pending
+            </a>
+            <a href="{{ url_for('admin.recipes', status='approved') }}" 
+               class="btn btn-{% if status_filter == 'approved' %}success{% else %}outline-success{% endif %}">
+                Approved
+            </a>
+            <a href="{{ url_for('admin.recipes', status='rejected') }}" 
+               class="btn btn-{% if status_filter == 'rejected' %}danger{% else %}outline-danger{% endif %}">
+                Rejected
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-lg">
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for recipe in recipes %}
+                            <tr>
+                                <td>
+                                    {% if recipe.image %}
+                                        <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" 
+                                             alt="{{ recipe.title }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+                                    {% else %}
+                                        <div style="width: 60px; height: 60px; background: var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-image text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td><strong>{{ recipe.title }}</strong></td>
+                                <td>
+                                    {{ recipe.author.full_name }}
+                                    {% if recipe.author.is_premium %}
+                                        <span class="badge bg-warning text-dark">Premium</span>
+                                    {% endif %}
+                                </td>
+                                <td><span class="badge bg-info">{{ recipe.category|capitalize }}</span></td>
+                                <td>
+                                    {% if recipe.status == 'pending' %}
+                                        <span class="badge badge-pending">Pending</span>
+                                    {% elif recipe.status == 'approved' %}
+                                        <span class="badge badge-approved">Approved</span>
+                                    {% else %}
+                                        <span class="badge badge-rejected">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ recipe.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        {% if recipe.status == 'pending' %}
+                                            <form method="POST" action="{{ url_for('admin.approve_recipe', recipe_id=recipe.id) }}" class="d-inline">
+                                                <button type="submit" class="btn btn-success btn-sm" title="Approve">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="{{ url_for('admin.reject_recipe', recipe_id=recipe.id) }}" class="d-inline">
+                                                <button type="submit" class="btn btn-warning btn-sm" title="Reject">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                        {% elif recipe.status == 'rejected' %}
+                                            <form method="POST" action="{{ url_for('admin.approve_recipe', recipe_id=recipe.id) }}" class="d-inline">
+                                                <button type="submit" class="btn btn-success btn-sm" title="Approve">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                        <form method="POST" action="{{ url_for('admin.delete_recipe', recipe_id=recipe.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

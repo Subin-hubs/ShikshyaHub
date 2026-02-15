@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.title }} - FlavorHive{% endblock %}
+
+{% block content %}
+{% include 'includes/user_sidebar.html' %}
+
+<div class="main-content">
+    <a href="javascript:history.back()" class="btn btn-secondary mb-3">
+        <i class="fas fa-arrow-left me-2"></i> Back
+    </a>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-lg mb-4">
+                {% if recipe.image %}
+                    <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" 
+                         class="card-img-top" alt="{{ recipe.title }}" style="max-height: 400px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body p-4">
+                    <h1 class="card-title text-primary mb-3">{{ recipe.title }}</h1>
+                    
+                    <div class="d-flex align-items-center mb-3 text-muted">
+                        <span class="me-3">
+                            <i class="fas fa-user me-1"></i> {{ recipe.author.full_name }}
+                            {% if recipe.author.is_premium %}
+                                <span class="badge bg-warning text-dark ms-1">Premium</span>
+                            {% endif %}
+                        </span>
+                        <span class="me-3">
+                            <i class="fas fa-calendar me-1"></i> {{ recipe.created_at.strftime('%B %d, %Y') }}
+                        </span>
+                        <span class="badge badge-{{ recipe.status }}">{{ recipe.status|capitalize }}</span>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="fas fa-clock text-primary fa-2x mb-2"></i>
+                                <p class="mb-0"><strong>{{ recipe.cooking_time or 'N/A' }}</strong> min</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="fas fa-users text-primary fa-2x mb-2"></i>
+                                <p class="mb-0"><strong>{{ recipe.servings or 'N/A' }}</strong> servings</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="fas fa-signal text-primary fa-2x mb-2"></i>
+                                <p class="mb-0"><strong>{{ recipe.difficulty|capitalize }}</strong></p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="fas fa-tag text-primary fa-2x mb-2"></i>
+                                <p class="mb-0"><strong>{{ recipe.category|capitalize }}</strong></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-primary mb-3"><i class="fas fa-info-circle me-2"></i> Description</h3>
+                    <p>{{ recipe.description }}</p>
+
+                    <h3 class="text-primary mb-3 mt-4"><i class="fas fa-shopping-basket me-2"></i> Ingredients</h3>
+                    <div class="bg-light p-3 rounded">
+                        <pre style="white-space: pre-wrap; font-family: inherit;">{{ recipe.ingredients }}</pre>
+                    </div>
+
+                    <h3 class="text-primary mb-3 mt-4"><i class="fas fa-list-ol me-2"></i> Cooking Steps</h3>
+                    <div class="bg-light p-3 rounded">
+                        <pre style="white-space: pre-wrap; font-family: inherit;">{{ recipe.steps }}</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="card shadow-lg">
+                <div class="card-body p-4">
+                    <h3 class="text-primary mb-3"><i class="fas fa-comments me-2"></i> Comments ({{ comments|length }})</h3>
+                    
+                    <!-- Add Comment Form -->
+                    <form method="POST" action="{{ url_for('user.add_comment', recipe_id=recipe.id) }}" class="mb-4">
+                        <div class="mb-3">
+                            <textarea class="form-control" name="comment" rows="3" 
+                                      placeholder="Share your thoughts about this recipe..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i> Post Comment
+                        </button>
+                    </form>
+
+                    <!-- Comments List -->
+                    {% if comments %}
+                        {% for comment in comments %}
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <strong class="text-primary">{{ comment.author.full_name }}</strong>
+                                        {% if comment.author.is_premium %}
+                                            <span class="badge bg-warning text-dark">Premium</span>
+                                        {% endif %}
+                                    </div>
+                                    <small class="text-muted">{{ comment.created_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
+                                </div>
+                                <p class="mb-0">{{ comment.comment }}</p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-3">
+                            <i class="fas fa-comment-slash fa-2x mb-2"></i><br>
+                            No comments yet. Be the first to comment!
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card shadow-lg mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-3">
+                        <i class="fas fa-user-circle me-2"></i> Recipe Author
+                    </h5>
+                    <p><strong>{{ recipe.author.full_name }}</strong></p>
+                    <p class="text-muted mb-0">
+                        Member since {{ recipe.author.created_at.strftime('%B %Y') }}
+                    </p>
+                </div>
+            </div>
+
+            {% if recipe.user_id == current_user.id %}
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary mb-3">
+                            <i class="fas fa-cog me-2"></i> Manage Recipe
+                        </h5>
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('user.edit_recipe', recipe_id=recipe.id) }}" 
+                               class="btn btn-secondary">
+                                <i class="fas fa-edit me-2"></i> Edit Recipe
+                            </a>
+                            <form method="POST" action="{{ url_for('user.delete_recipe', recipe_id=recipe.id) }}">
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class="fas fa-trash me-2"></i> Delete Recipe
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

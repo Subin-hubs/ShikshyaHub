@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('main.index') }}">
+            <i class="fas fa-utensils"></i> FlavorHive
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#about">About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#features">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#premium">Premium</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#contact">Contact</a>
+                </li>
+            </ul>
+            <div>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-login">Login</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section id="home" class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 hero-content">
+                <h1 class="hero-title slide-in-left">Share Your Culinary Masterpieces</h1>
+                <p class="hero-subtitle slide-in-left" style="animation-delay: 0.2s;">
+                    Discover, create, and share amazing recipes with food lovers around the world.
+                </p>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-cta slide-in-left" style="animation-delay: 0.4s;">
+                    Get Started Free <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <div class="recipe-grid slide-in-right">
+                    {% if featured_recipes %}
+                        {% for recipe in featured_recipes[:5] %}
+                            <div class="recipe-card {% if loop.first %}featured{% endif %}">
+                                {% if recipe.image %}
+                                    <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" alt="{{ recipe.title }}">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/400x300?text={{ recipe.title }}" alt="{{ recipe.title }}">
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="recipe-card featured">
+                            <img src="{{ url_for('static', filename='uploads/1.png') }}" alt="Recipe 1">
+                        </div>
+                        
+                        <div class="recipe-card">
+                            <img src="{{ url_for('static', filename='uploads/2.png') }}" alt="Recipe 2">
+                        </div>
+                        
+                        <div class="recipe-card">
+                            <img src="{{ url_for('static', filename='uploads/3.png') }}" alt="Recipe 3">
+                        </div>
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="bg-white">
+    <div class="container">
+        <h2 class="section-title">About FlavorHive</h2>
+        <p class="section-subtitle">Your ultimate destination for recipe sharing and culinary inspiration</p>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <p class="text-center" style="font-size: 1.1rem; line-height: 1.8; color: #666;">
+                    FlavorHive is a vibrant community where food enthusiasts come together to share their favorite recipes, 
+                    discover new culinary adventures, and connect with fellow cooking lovers. Whether you're a professional 
+                    chef or a home cook, FlavorHive provides the perfect platform to showcase your culinary creativity.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features">
+    <div class="container">
+        <h2 class="section-title">Amazing Features</h2>
+        <p class="section-subtitle">Everything you need to share and discover great recipes</p>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3>Easy Upload</h3>
+                    <p>Share your recipes with beautiful images and detailed instructions in just a few clicks.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Discover Recipes</h3>
+                    <p>Explore thousands of recipes from cuisines around the world, all in one place.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Community</h3>
+                    <p>Engage with other food lovers through comments, ratings, and recipe discussions.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Quality Control</h3>
+                    <p>All recipes are reviewed by our team to ensure high-quality content for our community.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Access your favorite recipes anytime, anywhere on any device.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3>Premium Features</h3>
+                    <p>Unlock exclusive features with our premium membership plan.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Premium Section -->
+<section id="premium" class="bg-white">
+    <div class="container">
+        <h2 class="section-title">Go Premium</h2>
+        <p class="section-subtitle">Unlock exclusive features and take your cooking journey to the next level</p>
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="premium-card">
+                    <h3 style="font-size: 2rem; font-weight: 700;">Premium Membership</h3>
+                    <div class="premium-price">NPR 500<span style="font-size: 1.2rem;">/month</span></div>
+                    <ul class="premium-features">
+                        <li><i class="fas fa-check me-2"></i> Unlimited Recipe Uploads</li>
+                        <li><i class="fas fa-check me-2"></i> Priority Recipe Approval</li>
+                        <li><i class="fas fa-check me-2"></i> Advanced Recipe Analytics</li>
+                        <li><i class="fas fa-check me-2"></i> Ad-Free Experience</li>
+                        <li><i class="fas fa-check me-2"></i> Exclusive Premium Badge</li>
+                        <li><i class="fas fa-check me-2"></i> Early Access to New Features</li>
+                    </ul>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg" style="border-radius: 25px; padding: 0.8rem 2rem; font-weight: 600;">
+                        Start Free Trial
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact">
+    <div class="container">
+        <h2 class="section-title">Get In Touch</h2>
+        <p class="section-subtitle">Have questions? We'd love to hear from you!</p>
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card p-4">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" placeholder="Your name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" placeholder="your@email.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Message</label>
+                            <textarea class="form-control" rows="5" placeholder="Your message..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5><i class="fas fa-utensils"></i> FlavorHive</h5>
+                <p>Your ultimate platform for discovering and sharing amazing recipes with food lovers worldwide.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5>Connect With Us</h5>
+                <div class="d-flex gap-3">
+                    <a href="#"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="#"><i class="fab fa-instagram fa-2x"></i></a>
+                    <a href="#"><i class="fab fa-twitter fa-2x"></i></a>
+                    <a href="#"><i class="fab fa-youtube fa-2x"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 FlavorHive. All rights reserved. Made with <i class="fas fa-heart text-danger"></i></p>
+        </div>
+    </div>
+</footer>
+{% endblock %}

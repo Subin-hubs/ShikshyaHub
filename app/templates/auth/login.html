@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Login - FlavorHive{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex align-items-center" style="background: linear-gradient(135deg, var(--background) 0%, #E8F4FD 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7">
+                <div class="card shadow-lg border-0 rounded-lg fade-in-up">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <h1 class="text-primary" style="font-size: 2.5rem; font-weight: 700;">
+                                <i class="fas fa-utensils"></i> FlavorHive
+                            </h1>
+                            <p class="text-muted">Welcome back! Please login to your account.</p>
+                        </div>
+
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <form method="POST" action="{{ url_for('auth.login') }}">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       placeholder="Enter your email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" 
+                                       placeholder="Enter your password" required>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                                <label class="form-check-label" for="remember">Remember me</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mb-3">
+                                <i class="fas fa-sign-in-alt me-2"></i> Login
+                            </button>
+                        </form>
+
+                        <div class="text-center">
+                            <p class="mb-0">Don't have an account? 
+                                <a href="{{ url_for('auth.register') }}" class="text-primary fw-bold">Register here</a>
+                            </p>
+                            <p class="mt-2">
+                                <a href="{{ url_for('main.index') }}" class="text-muted">
+                                    <i class="fas fa-arrow-left me-1"></i> Back to Home
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demo Credentials -->
+                <div class="card mt-3 shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <small class="text-muted">
+                            <strong>Demo Credentials:</strong><br>
+                            Admin: admin@flavorhive.com / admin123<br>
+                            User: Create your own account
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
