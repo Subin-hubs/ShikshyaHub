@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}Classes — ShikshyaHub{% endblock %}
+{% block role_label %}Admin Panel{% endblock %}
+{% block page_title %}Classes & Programs{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('admin_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Management</div>
+<a href="{{ url_for('admin_students') }}"><span class="nav-icon">🎓</span> Students</a>
+<a href="{{ url_for('admin_teachers') }}"><span class="nav-icon">👨‍🏫</span> Teachers</a>
+<a href="{{ url_for('admin_subjects') }}"><span class="nav-icon">📚</span> Subjects</a>
+<a href="{{ url_for('admin_classes') }}" class="active"><span class="nav-icon">🏛</span> Classes & Programs</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('admin_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<a href="{{ url_for('admin_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('admin_assignments') }}"><span class="nav-icon">📝</span> Assignments</a>
+<a href="{{ url_for('admin_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('admin_notices') }}"><span class="nav-icon">📢</span> Notices</a>
+<a href="{{ url_for('admin_fees') }}"><span class="nav-icon">💰</span> Fees</a>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Classes & Programs</h1><p>{{ classes|length }} classes · {{ programs|length }} programs</p></div>
+  <div style="display:flex;gap:10px;">
+    <button class="btn btn-outline" onclick="openModal('addProgramModal')">+ Add Program</button>
+    <button class="btn btn-primary" onclick="openModal('addClassModal')">+ Add Class</button>
+  </div>
+</div>
+<div class="grid-2 mb-4">
+  <div class="card">
+    <div class="card-header"><span class="card-title">🏛 Programs</span></div>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Program</th><th>Duration</th></tr></thead>
+        <tbody>
+          {% for p in programs %}<tr><td style="font-weight:600;color:var(--navy);">{{ p.name }}</td><td>{{ p.duration_years }} Years</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">📊 Stats</span></div>
+    <div class="card-body">
+      <div style="display:flex;justify-content:space-around;text-align:center;">
+        <div><div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--navy);">{{ programs|length }}</div><div style="font-size:.8rem;color:var(--text-light);">Programs</div></div>
+        <div><div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--navy);">{{ classes|length }}</div><div style="font-size:.8rem;color:var(--text-light);">Classes</div></div>
+        <div><div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--gold);">{{ classes|sum(attribute='student_count') }}</div><div style="font-size:.8rem;color:var(--text-light);">Students</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header"><span class="card-title">📚 All Classes</span></div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Class Name</th><th>Program</th><th>Semester</th><th>Section</th><th>Room</th><th>Students</th></tr></thead>
+      <tbody>
+        {% for c in classes %}
+        <tr>
+          <td style="font-weight:600;color:var(--navy);">{{ c.name }}</td>
+          <td style="font-size:.85rem;color:var(--text-secondary);">{{ c.program_name or '—' }}</td>
+          <td><span class="badge badge-navy">Sem {{ c.semester }}</span></td>
+          <td>Section {{ c.section }}</td>
+          <td>{{ c.room or '—' }}</td>
+          <td><span class="badge badge-gold">{{ c.student_count }} students</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addProgramModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">🏛 Create Program</span><div class="modal-close">✕</div></div>
+    <form method="POST" action="{{ url_for('admin_create_program') }}">
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Program Name</label><input type="text" name="name" class="form-control" required placeholder="e.g. Bachelor of Computer Science"></div>
+        <div class="form-row form-row-2">
+          <div class="form-group"><label class="form-label">Duration (Years)</label><input type="number" name="duration_years" class="form-control" value="4"></div>
+          <div class="form-group"><label class="form-label">Description</label><input type="text" name="description" class="form-control"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('addProgramModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create Program</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addClassModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">📚 Create Class</span><div class="modal-close">✕</div></div>
+    <form method="POST" action="{{ url_for('admin_create_class') }}">
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Class Name</label><input type="text" name="name" class="form-control" required placeholder="e.g. BCS Semester 1"></div>
+        <div class="form-row form-row-2">
+          <div class="form-group"><label class="form-label">Program</label><select name="program_id" class="form-control"><option value="">— Select —</option>{% for p in programs %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}</select></div>
+          <div class="form-group"><label class="form-label">Semester</label><select name="semester" class="form-control">{% for i in range(1,9) %}<option value="{{ i }}">Semester {{ i }}</option>{% endfor %}</select></div>
+        </div>
+        <div class="form-row form-row-2">
+          <div class="form-group"><label class="form-label">Section</label><input type="text" name="section" class="form-control" value="A" placeholder="A, B, C..."></div>
+          <div class="form-group"><label class="form-label">Room</label><input type="text" name="room" class="form-control" placeholder="e.g. Room 101"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('addClassModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create Class</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

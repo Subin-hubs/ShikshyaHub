@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}Profile — ShikshyaHub{% endblock %}
+{% block role_label %}Student Portal{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('student_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Learning</div>
+<a href="{{ url_for('student_subjects') }}"><span class="nav-icon">📚</span> My Subjects</a>
+<a href="{{ url_for('student_tasks') }}"><span class="nav-icon">📝</span> Tasks
+  {% if notif_by_type.get('assignment') %}<span class="nav-badge">{{ notif_by_type['assignment'] }}</span>{% endif %}
+</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('student_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('student_results') }}"><span class="nav-icon">📊</span> Results
+  {% if notif_by_type.get('result') %}<span class="nav-badge">{{ notif_by_type['result'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('student_notices') }}"><span class="nav-icon">📢</span> Notices
+  {% if notif_by_type.get('notice') %}<span class="nav-badge">{{ notif_by_type['notice'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_fees') }}"><span class="nav-icon">💰</span> Fees
+  {% if notif_by_type.get('fee') %}<span class="nav-badge">{{ notif_by_type['fee'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_profile') }}"><span class="nav-icon">👤</span> Profile</a>
+{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>My Profile</h1><p>Manage your personal information</p></div></div>
+
+<div class="grid-2">
+  <!-- Profile Card -->
+  <div class="card">
+    <div style="background:linear-gradient(135deg,var(--navy),var(--navy-light));padding:36px;text-align:center;">
+      <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:700;margin:0 auto 14px;">{{ user.name[0].upper() }}</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:#fff;">{{ user.name }}</div>
+      <div style="color:rgba(255,255,255,.65);font-size:.875rem;margin-top:6px;">{{ user.email }}</div>
+      <span class="badge" style="background:var(--gold);color:#fff;margin-top:10px;display:inline-block;">{{ user.role.title() }}</span>
+    </div>
+    <div class="card-body">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:.875rem;">
+          <span style="color:var(--text-light);font-weight:600;">Member Since</span>
+          <span style="color:var(--navy);">{{ user.created_at[:10] }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:.875rem;">
+          <span style="color:var(--text-light);font-weight:600;">Phone</span>
+          <span style="color:var(--navy);">{{ user.phone or 'Not set' }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:.875rem;">
+          <span style="color:var(--text-light);font-weight:600;">Address</span>
+          <span style="color:var(--navy);text-align:right;">{{ user.address or 'Not set' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Profile -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">✏️ Edit Profile</span></div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('student_update_profile') }}">
+        <div class="form-group"><label class="form-label">Full Name</label><input type="text" name="name" class="form-control" value="{{ user.name }}" required></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" value="{{ user.email }}" disabled style="background:var(--bg);cursor:not-allowed;"></div>
+        <div class="form-group"><label class="form-label">Phone Number</label><input type="text" name="phone" class="form-control" value="{{ user.phone or '' }}" placeholder="+977-9xxxxxxxxx"></div>
+        <div class="form-group"><label class="form-label">Address</label><textarea name="address" class="form-control" rows="3" placeholder="Your address">{{ user.address or '' }}</textarea></div>
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Resume Builder -->
+<div class="card mt-4">
+  <div class="card-header"><span class="card-title">📄 Resume Builder</span><span class="badge badge-gold">Beta</span></div>
+  <div class="card-body">
+    <p style="color:var(--text-secondary);font-size:.875rem;margin-bottom:20px;">Build your professional resume using your ShikshyaHub academic data. Add skills, projects, and certifications to generate a PDF resume.</p>
+    <div class="grid-2">
+      <div class="form-group"><label class="form-label">Skills (comma separated)</label><textarea class="form-control" rows="2" placeholder="Python, JavaScript, Communication, Leadership..."></textarea></div>
+      <div class="form-group"><label class="form-label">Projects</label><textarea class="form-control" rows="2" placeholder="Project name — brief description"></textarea></div>
+      <div class="form-group"><label class="form-label">Certifications</label><textarea class="form-control" rows="2" placeholder="AWS Cloud Practitioner, Google Analytics..."></textarea></div>
+      <div class="form-group"><label class="form-label">Languages</label><textarea class="form-control" rows="2" placeholder="Nepali (Native), English (Fluent)..."></textarea></div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:10px;">
+      <button class="btn btn-primary" onclick="alert('Resume generation requires PDF library. Install reportlab and configure this feature.')">📥 Generate PDF Resume</button>
+      <button class="btn btn-outline">Preview</button>
+    </div>
+    <div style="margin-top:12px;padding:12px 16px;background:var(--info-light);border-radius:var(--radius-sm);font-size:.82rem;color:var(--info);">
+      ℹ️ Your academic records from ShikshyaHub will be automatically included in the resume.
+    </div>
+  </div>
+</div>
+{% endblock %}

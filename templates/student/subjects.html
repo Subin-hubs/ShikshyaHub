@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}My Subjects — ShikshyaHub{% endblock %}
+{% block role_label %}Student Portal{% endblock %}
+{% block page_title %}My Subjects{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('student_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Learning</div>
+<a href="{{ url_for('student_subjects') }}"><span class="nav-icon">📚</span> My Subjects</a>
+<a href="{{ url_for('student_tasks') }}"><span class="nav-icon">📝</span> Tasks
+  {% if notif_by_type.get('assignment') %}<span class="nav-badge">{{ notif_by_type['assignment'] }}</span>{% endif %}
+</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('student_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('student_results') }}"><span class="nav-icon">📊</span> Results
+  {% if notif_by_type.get('result') %}<span class="nav-badge">{{ notif_by_type['result'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('student_notices') }}"><span class="nav-icon">📢</span> Notices
+  {% if notif_by_type.get('notice') %}<span class="nav-badge">{{ notif_by_type['notice'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_fees') }}"><span class="nav-icon">💰</span> Fees
+  {% if notif_by_type.get('fee') %}<span class="nav-badge">{{ notif_by_type['fee'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_profile') }}"><span class="nav-icon">👤</span> Profile</a>
+{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>My Subjects</h1><p>{{ subjects|length }} subjects enrolled{% if class_info %} · {{ class_info.name }}{% endif %}</p></div></div>
+<div class="grid-3">
+  {% for s in subjects %}
+  {% set colors = ['#1a2f57','#276749','#2c5282','#702459','#744210','#2d3748'] %}
+  <div class="card" style="overflow:hidden;">
+    <div style="height:5px;background:linear-gradient(90deg,var(--navy),var(--gold));"></div>
+    <div class="card-body">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+        <div>
+          <span class="badge badge-gold" style="margin-bottom:8px;">{{ s.code }}</span>
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--navy);">{{ s.name }}</h3>
+        </div>
+        <div style="width:42px;height:42px;border-radius:10px;background:var(--gold-pale);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">📖</div>
+      </div>
+      <div style="font-size:.82rem;color:var(--text-light);margin-bottom:4px;">👨‍🏫 {{ s.teacher_name or 'Not assigned' }}</div>
+      <div style="font-size:.82rem;color:var(--text-light);margin-bottom:16px;">{{ s.description or 'No description' }}</div>
+      <a href="{{ url_for('student_subject_detail', sid=s.id) }}" class="btn btn-primary" style="width:100%;justify-content:center;">Open Subject →</a>
+    </div>
+  </div>
+  {% else %}
+  <div class="card" style="grid-column:1/-1;padding:48px;text-align:center;">
+    <div style="font-size:3rem;opacity:.3;">📚</div>
+    <p style="color:var(--text-light);margin-top:12px;">No subjects enrolled. Contact admin to be assigned to a class.</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

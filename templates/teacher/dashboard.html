@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Teacher Dashboard — ShikshyaHub{% endblock %}
+{% block role_label %}Teacher Portal{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('teacher_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Teaching</div>
+<a href="{{ url_for('teacher_subjects') }}"><span class="nav-icon">📚</span> My Subjects</a>
+<a href="{{ url_for('teacher_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('teacher_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Communication</div>
+<a href="{{ url_for('teacher_notices') }}"><span class="nav-icon">📢</span> Notices
+  {% if notif_by_type.get('notice') %}<span class="nav-badge">{{ notif_by_type['notice'] }}</span>{% endif %}
+</a>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Welcome, {{ session.name.split()[0] }} 👋</h1>
+    <p>Here's your teaching overview for today.</p>
+  </div>
+</div>
+
+<div class="grid-4 mb-4">
+  <div class="stat-card"><div class="icon stat-icon-navy">📚</div><div><div class="stat-val" data-count="{{ subjects|length }}">0</div><div class="stat-label">My Subjects</div></div></div>
+  <div class="stat-card"><div class="icon stat-icon-blue">📅</div><div><div class="stat-val" data-count="{{ today_classes|length }}">0</div><div class="stat-label">Today's Classes</div></div></div>
+  <div class="stat-card"><div class="icon" style="background:var(--warning-light);">📝</div><div><div class="stat-val" data-count="{{ pending_grading }}">0</div><div class="stat-label">To Grade</div></div></div>
+  <div class="stat-card"><div class="icon stat-icon-green">✅</div><div><div class="stat-val">Active</div><div class="stat-label">Status</div></div></div>
+</div>
+
+<div class="grid-2 mb-4">
+  <!-- Today's Schedule -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">📅 Today's Schedule</span></div>
+    <div class="card-body" style="padding:0;">
+      {% for c in today_classes %}
+      <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;">
+        <div style="background:var(--gold-pale);border-radius:8px;padding:8px 12px;text-align:center;min-width:70px;">
+          <div style="font-size:.72rem;font-weight:700;color:var(--gold);text-transform:uppercase;">{{ c.day }}</div>
+          <div style="font-size:.9rem;font-weight:700;color:var(--navy);">{{ c.start_time }}</div>
+        </div>
+        <div>
+          <div style="font-weight:600;color:var(--navy);">{{ c.subject_name }}</div>
+          <div style="font-size:.78rem;color:var(--text-light);">{{ c.class_name }} · {{ c.room or 'TBD' }}</div>
+        </div>
+      </div>
+      {% else %}
+      <div class="empty-state"><div class="empty-icon">📅</div>No classes today.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Recent Notices -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">📢 Notices</span><a href="{{ url_for('teacher_notices') }}" class="btn btn-sm btn-outline">View All</a></div>
+    <div class="card-body" style="padding:0;">
+      {% for n in notices %}
+      <div style="padding:14px 20px;border-bottom:1px solid var(--border);">
+        <div style="font-weight:600;font-size:.875rem;color:var(--navy);">{{ n.title }}</div>
+        <div style="font-size:.78rem;color:var(--text-light);margin-top:4px;">{{ n.content[:80] }}{% if n.content|length > 80 %}...{% endif %}</div>
+        <div style="font-size:.72rem;color:var(--text-light);margin-top:6px;">{{ n.created_at[:10] }}</div>
+      </div>
+      {% else %}
+      <div class="empty-state"><div class="empty-icon">📢</div>No notices.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- My Subjects Quick View -->
+<div class="card">
+  <div class="card-header"><span class="card-title">📚 My Subjects</span><a href="{{ url_for('teacher_subjects') }}" class="btn btn-sm btn-outline">View All</a></div>
+  <div class="card-body" style="display:flex;flex-wrap:wrap;gap:14px;padding:20px;">
+    {% for s in subjects %}
+    <a href="{{ url_for('teacher_subject_detail', sid=s.id) }}" style="display:block;padding:16px 20px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);min-width:160px;transition:all .2s;text-decoration:none;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:1.5rem;margin-bottom:8px;">📚</div>
+      <div style="font-weight:700;color:var(--navy);font-size:.9rem;">{{ s.name }}</div>
+      <div style="font-size:.75rem;color:var(--text-light);margin-top:4px;"><span class="badge badge-gold">{{ s.code }}</span></div>
+    </a>
+    {% else %}
+    <div class="empty-state w-full"><div class="empty-icon">📚</div>No subjects assigned yet.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

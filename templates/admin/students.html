@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block title %}Students — ShikshyaHub{% endblock %}
+{% block role_label %}Admin Panel{% endblock %}
+{% block page_title %}Students{% endblock %}
+
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('admin_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Management</div>
+<a href="{{ url_for('admin_students') }}" class="active"><span class="nav-icon">🎓</span> Students</a>
+<a href="{{ url_for('admin_teachers') }}"><span class="nav-icon">👨‍🏫</span> Teachers</a>
+<a href="{{ url_for('admin_subjects') }}"><span class="nav-icon">📚</span> Subjects</a>
+<a href="{{ url_for('admin_classes') }}"><span class="nav-icon">🏛</span> Classes & Programs</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('admin_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<a href="{{ url_for('admin_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('admin_assignments') }}"><span class="nav-icon">📝</span> Assignments</a>
+<a href="{{ url_for('admin_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('admin_notices') }}"><span class="nav-icon">📢</span> Notices</a>
+<a href="{{ url_for('admin_fees') }}"><span class="nav-icon">💰</span> Fees</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Students Management</h1>
+    <p>{{ students|length }} total students enrolled</p>
+  </div>
+  <button class="btn btn-primary" onclick="openModal('addStudentModal')">+ Add Student</button>
+</div>
+
+<!-- Search/Filter bar -->
+<div class="card mb-4">
+  <div class="card-body" style="padding:16px 20px;">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <input type="text" id="searchInput" class="form-control" placeholder="Search by name or email..." style="max-width:300px;" oninput="filterTable()">
+      <select id="classFilter" class="form-control" style="max-width:200px;" onchange="filterTable()">
+        <option value="">All Classes</option>
+        {% for c in classes %}<option value="{{ c.name }}">{{ c.name }}</option>{% endfor %}
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="table-wrapper">
+    <table id="studentsTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Student</th>
+          <th>Email</th>
+          <th>Class</th>
+          <th>Joined</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in students %}
+        <tr>
+          <td style="color:var(--text-light);font-size:.8rem;">{{ loop.index }}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy-light));display:flex;align-items:center;justify-content:center;color:#fff;font-size:.85rem;font-weight:700;flex-shrink:0;">{{ s.name[0].upper() }}</div>
+              <div>
+                <div style="font-weight:600;color:var(--navy);">{{ s.name }}</div>
+                <div style="font-size:.75rem;color:var(--text-light);">ID: {{ s.id }}</div>
+              </div>
+            </div>
+          </td>
+          <td style="color:var(--text-secondary);font-size:.875rem;">{{ s.email }}</td>
+          <td>{% if s.class_name %}<span class="badge badge-navy">{{ s.class_name }}</span>{% else %}<span class="badge badge-warning">Unassigned</span>{% endif %}</td>
+          <td style="font-size:.82rem;color:var(--text-light);">{{ s.created_at[:10] }}</td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-sm btn-outline" onclick="openModal('editStudent{{ s.id }}')">✏️</button>
+              <form method="POST" action="{{ url_for('admin_delete_student', sid=s.id) }}" style="display:inline;">
+                <button type="submit" class="btn btn-sm btn-danger" data-confirm="Delete {{ s.name }}?">🗑️</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center" style="padding:40px;color:var(--text-light);">No students found. Create one to get started.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add Student Modal -->
+<div class="modal-overlay" id="addStudentModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🎓 Create Student Account</span>
+      <div class="modal-close">✕</div>
+    </div>
+    <form method="POST" action="{{ url_for('admin_create_student') }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="name" class="form-control" required placeholder="e.g. Rajan Sharma">
+        </div>
+        <div class="form-row form-row-2">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" required placeholder="student@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="text" name="password" class="form-control" required placeholder="Set password">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Assign to Class</label>
+          <select name="class_id" class="form-control">
+            <option value="">— Select Class (Optional) —</option>
+            {% for c in classes %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('addStudentModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create Student</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+function filterTable() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const classFilter = document.getElementById('classFilter').value.toLowerCase();
+  document.querySelectorAll('#studentsTable tbody tr').forEach(row => {
+    const text = row.textContent.toLowerCase();
+    const match = text.includes(search) && (classFilter === '' || text.includes(classFilter));
+    row.style.display = match ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}
+{% endblock %}

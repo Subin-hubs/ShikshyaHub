@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Timetable — ShikshyaHub{% endblock %}
+{% block role_label %}Admin Panel{% endblock %}
+{% block page_title %}Timetable Management{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('admin_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Management</div>
+<a href="{{ url_for('admin_students') }}"><span class="nav-icon">🎓</span> Students</a>
+<a href="{{ url_for('admin_teachers') }}"><span class="nav-icon">👨‍🏫</span> Teachers</a>
+<a href="{{ url_for('admin_subjects') }}"><span class="nav-icon">📚</span> Subjects</a>
+<a href="{{ url_for('admin_classes') }}"><span class="nav-icon">🏛</span> Classes & Programs</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('admin_timetable') }}" class="active"><span class="nav-icon">📅</span> Timetable</a>
+<a href="{{ url_for('admin_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('admin_assignments') }}"><span class="nav-icon">📝</span> Assignments</a>
+<a href="{{ url_for('admin_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('admin_notices') }}"><span class="nav-icon">📢</span> Notices</a>
+<a href="{{ url_for('admin_fees') }}"><span class="nav-icon">💰</span> Fees</a>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Timetable Management</h1><p>{{ timetable|length }} schedule entries</p></div>
+  <button class="btn btn-primary" onclick="openModal('addTTModal')">+ Add Entry</button>
+</div>
+<div class="card mb-4">
+  <div class="card-header"><span class="card-title">📅 Weekly Schedule</span></div>
+  <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>Day</th><th>Time</th><th>Subject</th><th>Class</th><th>Teacher</th><th>Room</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in timetable %}
+        <tr>
+          <td><span class="badge badge-navy">{{ t.day }}</span></td>
+          <td style="font-size:.85rem;font-weight:600;color:var(--navy);">{{ t.start_time }} – {{ t.end_time }}</td>
+          <td style="font-weight:600;">{{ t.subject_name }}</td>
+          <td>{{ t.class_name }}</td>
+          <td style="color:var(--text-secondary);">{{ t.teacher_name or '—' }}</td>
+          <td><span class="badge badge-gold">{{ t.room or '—' }}</span></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center" style="padding:40px;color:var(--text-light);">No timetable entries yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addTTModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">📅 Add Timetable Entry</span><div class="modal-close">✕</div></div>
+    <form method="POST" action="{{ url_for('admin_create_timetable') }}">
+      <div class="modal-body">
+        <div class="form-row form-row-2">
+          <div class="form-group"><label class="form-label">Class</label><select name="class_id" class="form-control" required><option value="">— Select Class —</option>{% for c in classes %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}</select></div>
+          <div class="form-group"><label class="form-label">Subject</label><select name="subject_id" class="form-control" required><option value="">— Select Subject —</option>{% for s in subjects %}<option value="{{ s.id }}">{{ s.name }} ({{ s.teacher_name or 'No teacher' }})</option>{% endfor %}</select></div>
+        </div>
+        <div class="form-group"><label class="form-label">Day</label><select name="day" class="form-control" required><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option></select></div>
+        <div class="form-row form-row-2">
+          <div class="form-group"><label class="form-label">Start Time</label><input type="time" name="start_time" class="form-control" required></div>
+          <div class="form-group"><label class="form-label">End Time</label><input type="time" name="end_time" class="form-control" required></div>
+        </div>
+        <div class="form-group"><label class="form-label">Room</label><input type="text" name="room" class="form-control" placeholder="e.g. Room 101"></div>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('addTTModal')">Cancel</button><button type="submit" class="btn btn-primary">Add Entry</button></div>
+    </form>
+  </div>
+</div>
+{% endblock %}

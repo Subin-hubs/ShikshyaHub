@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard — ShikshyaHub{% endblock %}
+{% block role_label %}Admin Panel{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('admin_dashboard') }}" class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+  <span class="nav-icon">🏠</span> Dashboard
+</a>
+<div class="sidebar-section-label">Management</div>
+<a href="{{ url_for('admin_students') }}"><span class="nav-icon">🎓</span> Students</a>
+<a href="{{ url_for('admin_teachers') }}"><span class="nav-icon">👨‍🏫</span> Teachers</a>
+<a href="{{ url_for('admin_subjects') }}"><span class="nav-icon">📚</span> Subjects</a>
+<a href="{{ url_for('admin_classes') }}"><span class="nav-icon">🏛</span> Classes & Programs</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('admin_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<a href="{{ url_for('admin_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('admin_assignments') }}"><span class="nav-icon">📝</span> Assignments</a>
+<a href="{{ url_for('admin_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('admin_notices') }}"><span class="nav-icon">📢</span> Notices</a>
+<a href="{{ url_for('admin_fees') }}"><span class="nav-icon">💰</span> Fees</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Welcome back, {{ session.name.split()[0] }} 👋</h1>
+    <p>Here's what's happening at your institution today.</p>
+  </div>
+  <div style="display:flex;gap:10px;">
+    <button class="btn btn-outline btn-sm" onclick="openModal('addStudentModal')">+ Add Student</button>
+    <button class="btn btn-gold btn-sm" onclick="openModal('addTeacherModal')">+ Add Teacher</button>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="grid-4 mb-4">
+  <div class="stat-card">
+    <div class="icon stat-icon-navy">🎓</div>
+    <div>
+      <div class="stat-val" data-count="{{ stats.students }}">0</div>
+      <div class="stat-label">Total Students</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="icon stat-icon-green">👨‍🏫</div>
+    <div>
+      <div class="stat-val" data-count="{{ stats.teachers }}">0</div>
+      <div class="stat-label">Teachers</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="icon stat-icon-blue">📚</div>
+    <div>
+      <div class="stat-val" data-count="{{ stats.subjects }}">0</div>
+      <div class="stat-label">Subjects</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="icon" style="background:rgba(196,150,42,.15);">🏛</div>
+    <div>
+      <div class="stat-val" data-count="{{ stats.classes }}">0</div>
+      <div class="stat-label">Classes</div>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2 mb-4">
+  <!-- Attendance Overview -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">📊 Attendance Overview</span>
+    </div>
+    <div class="card-body" style="display:flex;align-items:center;gap:28px;">
+      <canvas id="attChart" data-pct="{{ att_pct }}" width="130" height="130" style="flex-shrink:0;"></canvas>
+      <div style="flex:1;">
+        <div style="margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:6px;">
+            <span style="font-weight:600;color:var(--navy);">Overall Attendance</span>
+            <span style="color:var(--gold);font-weight:700;">{{ att_pct }}%</span>
+          </div>
+          <div class="progress"><div class="progress-bar progress-bar-gold" style="width:{{ att_pct }}%;"></div></div>
+        </div>
+        <div style="display:flex;gap:16px;font-size:.8rem;">
+          <div><div style="color:var(--success);font-weight:700;">Present Rate</div><div style="color:var(--text-light);">{{ att_pct }}%</div></div>
+          <div><div style="color:var(--danger);font-weight:700;">Absent Rate</div><div style="color:var(--text-light);">{{ 100-att_pct }}%</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fee Overview -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">💰 Fee Collection</span>
+      <a href="{{ url_for('admin_fees') }}" class="btn btn-sm btn-outline">View All</a>
+    </div>
+    <div class="card-body">
+      {% if fees_overview and fees_overview.total %}
+      {% set pct = ((fees_overview.paid or 0) / fees_overview.total * 100)|round(1) %}
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:.9rem;">
+        <span><span style="font-weight:700;color:var(--navy);">Total:</span> Rs. {{ '{:,.0f}'.format(fees_overview.total or 0) }}</span>
+        <span><span style="font-weight:700;color:var(--success);">Collected:</span> Rs. {{ '{:,.0f}'.format(fees_overview.paid or 0) }}</span>
+      </div>
+      <div class="progress" style="height:12px;margin-bottom:8px;">
+        <div class="progress-bar progress-bar-success" style="width:{{ pct }}%;"></div>
+      </div>
+      <div style="font-size:.8rem;color:var(--text-light);">{{ pct }}% collected · Rs. {{ '{:,.0f}'.format((fees_overview.total or 0) - (fees_overview.paid or 0)) }} pending</div>
+      {% else %}
+      <div class="empty-state"><div class="empty-icon">💰</div>No fee records yet.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- Recent Students -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">🎓 Recent Students</span>
+      <a href="{{ url_for('admin_students') }}" class="btn btn-sm btn-outline">View All</a>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Joined</th></tr></thead>
+        <tbody>
+          {% for s in recent_students %}
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy-light));display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:700;flex-shrink:0;">{{ s.name[0].upper() }}</div>{{ s.name }}</div></td>
+            <td style="color:var(--text-light);font-size:.82rem;">{{ s.email }}</td>
+            <td><span class="badge badge-navy">{{ s.created_at[:10] }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3" class="text-center text-muted" style="padding:24px;">No students yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Recent Notices -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">📢 Recent Notices</span>
+      <a href="{{ url_for('admin_notices') }}" class="btn btn-sm btn-outline">View All</a>
+    </div>
+    <div class="card-body" style="padding:0;">
+      {% for notice in recent_notices %}
+      <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div>
+          <div style="font-weight:600;font-size:.875rem;color:var(--navy);">{{ notice.title }}</div>
+          <div style="font-size:.78rem;color:var(--text-light);margin-top:2px;">{{ notice.created_at[:10] }}</div>
+        </div>
+        <span class="badge badge-{{ 'gold' if notice.audience=='all' else 'info' if notice.audience=='students' else 'navy' }}">{{ notice.audience }}</span>
+      </div>
+      {% else %}
+      <div class="empty-state"><div class="empty-icon">📢</div>No notices yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card mt-4">
+  <div class="card-header"><span class="card-title">⚡ Quick Actions</span></div>
+  <div class="card-body" style="display:flex;flex-wrap:wrap;gap:12px;">
+    <button class="btn btn-primary" onclick="openModal('addStudentModal')">🎓 Create Student</button>
+    <button class="btn btn-gold" onclick="openModal('addTeacherModal')">👨‍🏫 Create Teacher</button>
+    <a href="{{ url_for('admin_subjects') }}" class="btn btn-outline">📚 Manage Subjects</a>
+    <a href="{{ url_for('admin_classes') }}" class="btn btn-outline">🏛 Manage Classes</a>
+    <a href="{{ url_for('admin_notices') }}" class="btn btn-outline">📢 Post Notice</a>
+    <a href="{{ url_for('admin_fees') }}" class="btn btn-outline">💰 Manage Fees</a>
+  </div>
+</div>
+
+<!-- Add Student Modal -->
+<div class="modal-overlay" id="addStudentModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🎓 Create Student Account</span>
+      <div class="modal-close">✕</div>
+    </div>
+    <form method="POST" action="{{ url_for('admin_create_student') }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="name" class="form-control" required placeholder="e.g. Rajan Sharma">
+        </div>
+        <div class="form-row form-row-2">
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" name="email" class="form-control" required placeholder="student@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="text" name="password" class="form-control" required placeholder="Set password">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Assign to Class</label>
+          <select name="class_id" class="form-control">
+            <option value="">— Select Class (Optional) —</option>
+            {% set classes = [] %}
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('addStudentModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create Student</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Teacher Modal -->
+<div class="modal-overlay" id="addTeacherModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">👨‍🏫 Create Teacher Account</span>
+      <div class="modal-close">✕</div>
+    </div>
+    <form method="POST" action="{{ url_for('admin_create_teacher') }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="name" class="form-control" required placeholder="e.g. Dr. Sarah Johnson">
+        </div>
+        <div class="form-row form-row-2">
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" name="email" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="text" name="password" class="form-control" required>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('addTeacherModal')">Cancel</button>
+        <button type="submit" class="btn btn-gold">Create Teacher</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

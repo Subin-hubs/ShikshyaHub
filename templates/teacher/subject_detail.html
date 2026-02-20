@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% block title %}{{ subject.name }} — ShikshyaHub{% endblock %}
+{% block role_label %}Teacher Portal{% endblock %}
+{% block page_title %}{{ subject.name }}{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('teacher_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Teaching</div>
+<a href="{{ url_for('teacher_subjects') }}"><span class="nav-icon">📚</span> My Subjects</a>
+<a href="{{ url_for('teacher_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('teacher_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Communication</div>
+<a href="{{ url_for('teacher_notices') }}"><span class="nav-icon">📢</span> Notices
+  {% if notif_by_type.get('notice') %}<span class="nav-badge">{{ notif_by_type['notice'] }}</span>{% endif %}
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Subject hero -->
+<div class="card mb-4" style="background:linear-gradient(135deg,var(--navy),var(--navy-light));color:#fff;">
+  <div class="card-body" style="padding:28px;">
+    <a href="{{ url_for('teacher_subjects') }}" style="color:rgba(255,255,255,.6);font-size:.82rem;display:inline-flex;align-items:center;gap:5px;margin-bottom:14px;">← My Subjects</a>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+      <div>
+        <span class="badge" style="background:var(--gold);color:#fff;margin-bottom:10px;">{{ subject.code }}</span>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.9rem;color:#fff;margin-bottom:6px;">{{ subject.name }}</h2>
+        <p style="color:rgba(255,255,255,.7);font-size:.88rem;">{{ subject.class_name }} · {{ subject.description or 'No description' }}</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.2);" onclick="openModal('addMaterialModal')">
+          📁 Upload Material
+        </button>
+        <button class="btn btn-sm" style="background:var(--gold);color:#fff;" onclick="openModal('addAssignmentModal')">
+          📝 + Assignment
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2 mb-4">
+  <!-- Students -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">🎓 Enrolled Students</span>
+      <span class="badge badge-navy">{{ students|length }}</span>
+    </div>
+    <div style="max-height:260px;overflow-y:auto;">
+      {% for s in students %}
+      <div style="padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+        <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy-light));display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:700;flex-shrink:0;">
+          {{ s.name[0].upper() }}
+        </div>
+        <span style="font-size:.875rem;color:var(--navy);font-weight:500;">{{ s.name }}</span>
+        <span style="font-size:.72rem;color:var(--text-light);margin-left:auto;">{{ s.email }}</span>
+      </div>
+      {% else %}
+      <div class="empty-state"><div class="empty-icon">🎓</div>No students enrolled.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Materials -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">📁 Course Materials</span>
+      <button class="btn btn-sm btn-outline" onclick="openModal('addMaterialModal')">+ Upload</button>
+    </div>
+    <div style="max-height:260px;overflow-y:auto;">
+      {% for m in materials %}
+      <div style="padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+        <div style="width:34px;height:34px;border-radius:8px;background:var(--info-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          {% if m.file_type == 'pdf' %}📄{% elif m.file_type in ('ppt','pptx') %}📊{% elif m.file_type in ('doc','docx') %}📝{% else %}📎{% endif %}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:.875rem;font-weight:600;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.title }}</div>
+          <div style="font-size:.72rem;color:var(--text-light);">{{ m.file_type|upper if m.file_type else 'File' }} · {{ m.uploaded_at[:10] }}</div>
+        </div>
+        {% if m.file_path %}
+        <a href="{{ url_for('serve_upload', folder='materials', filename=m.file_path) }}"
+           class="btn btn-xs btn-outline" download>↓</a>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="empty-state"><div class="empty-icon">📁</div>No materials uploaded yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Assignments -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">📝 Assignments</span>
+    <button class="btn btn-sm btn-primary" onclick="openModal('addAssignmentModal')">+ Create</button>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Title</th><th>Due Date</th><th>Max Marks</th><th>Submissions</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for a in assignments %}
+        <tr>
+          <td>
+            <div style="font-weight:700;color:var(--navy);">{{ a.title }}</div>
+            {% if a.description %}
+            <div style="font-size:.75rem;color:var(--text-light);">{{ a.description[:60] }}{{ '...' if a.description|length > 60 }}</div>
+            {% endif %}
+          </td>
+          <td style="font-size:.82rem;white-space:nowrap;">{{ a.due_date or '—' }}</td>
+          <td><span class="badge badge-gold">{{ a.max_marks }} pts</span></td>
+          <td>
+            <span class="badge badge-{{ 'success' if a.sub_count > 0 else 'info' }}">{{ a.sub_count }} submitted</span>
+          </td>
+          <td>
+            <a href="{{ url_for('teacher_view_submissions', aid=a.id) }}" class="btn btn-sm btn-outline">View →</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center" style="padding:32px;color:var(--text-light);">No assignments created yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add Material Modal -->
+<div class="modal-overlay" id="addMaterialModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">📁 Upload Course Material</span>
+      <div class="modal-close">✕</div>
+    </div>
+    <form method="POST" action="{{ url_for('teacher_upload_material') }}" enctype="multipart/form-data">
+      <input type="hidden" name="subject_id" value="{{ subject.id }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Material Title</label>
+          <input type="text" name="title" class="form-control" required placeholder="e.g., Week 3 Lecture Notes">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Upload File</label>
+          <div class="file-input-wrap">
+            <input type="file" name="file" required
+                   accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.png,.jpg,.jpeg">
+            <div class="file-icon">📎</div>
+            <div class="file-label">Click to choose file or drag & drop</div>
+            <div class="file-hint">PDF, DOCX, PPTX, XLSX, TXT, Images · Max 20MB</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('addMaterialModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">📁 Upload Material</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Assignment Modal -->
+<div class="modal-overlay" id="addAssignmentModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">📝 Create Assignment</span>
+      <div class="modal-close">✕</div>
+    </div>
+    <form method="POST" action="{{ url_for('teacher_create_assignment') }}" enctype="multipart/form-data">
+      <input type="hidden" name="subject_id" value="{{ subject.id }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Assignment Title</label>
+          <input type="text" name="title" class="form-control" required placeholder="e.g., Chapter 3 Review">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description / Instructions</label>
+          <textarea name="description" class="form-control" rows="3" placeholder="Describe the assignment tasks..."></textarea>
+        </div>
+        <div class="form-row form-row-2">
+          <div class="form-group">
+            <label class="form-label">Due Date</label>
+            <input type="date" name="due_date" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Max Marks</label>
+            <input type="number" name="max_marks" class="form-control" value="100" min="1">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Attach File (optional — question paper, etc.)</label>
+          <div class="file-input-wrap">
+            <input type="file" name="file" accept=".pdf,.doc,.docx,.txt,.ppt,.pptx">
+            <div class="file-icon">📎</div>
+            <div class="file-label">Attach assignment sheet (optional)</div>
+            <div class="file-hint">PDF, DOCX, PPT, TXT</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('addAssignmentModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">📝 Create Assignment</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

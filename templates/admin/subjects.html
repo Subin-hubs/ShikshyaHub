@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Subjects — ShikshyaHub{% endblock %}
+{% block role_label %}Admin Panel{% endblock %}
+{% block page_title %}Subjects{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('admin_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Management</div>
+<a href="{{ url_for('admin_students') }}"><span class="nav-icon">🎓</span> Students</a>
+<a href="{{ url_for('admin_teachers') }}"><span class="nav-icon">👨‍🏫</span> Teachers</a>
+<a href="{{ url_for('admin_subjects') }}" class="active"><span class="nav-icon">📚</span> Subjects</a>
+<a href="{{ url_for('admin_classes') }}"><span class="nav-icon">🏛</span> Classes & Programs</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('admin_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<a href="{{ url_for('admin_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('admin_assignments') }}"><span class="nav-icon">📝</span> Assignments</a>
+<a href="{{ url_for('admin_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('admin_notices') }}"><span class="nav-icon">📢</span> Notices</a>
+<a href="{{ url_for('admin_fees') }}"><span class="nav-icon">💰</span> Fees</a>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Subjects Management</h1><p>{{ subjects|length }} subjects available</p></div>
+  <button class="btn btn-primary" onclick="openModal('addSubjectModal')">+ Add Subject</button>
+</div>
+<div class="card">
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>#</th><th>Subject</th><th>Code</th><th>Teacher</th><th>Class</th><th>Credits</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for s in subjects %}
+        <tr>
+          <td style="color:var(--text-light);">{{ loop.index }}</td>
+          <td><div style="font-weight:600;color:var(--navy);">{{ s.name }}</div><div style="font-size:.75rem;color:var(--text-light);">{{ s.description or '' }}</div></td>
+          <td><span class="badge badge-gold">{{ s.code }}</span></td>
+          <td>{{ s.teacher_name or '—' }}</td>
+          <td><span class="badge badge-navy">{{ s.class_name or 'Unassigned' }}</span></td>
+          <td>{{ s.credits }} credits</td>
+          <td>
+            <form method="POST" action="{{ url_for('admin_delete_subject', sid=s.id) }}" style="display:inline;">
+              <button type="submit" class="btn btn-sm btn-danger" data-confirm="Delete {{ s.name }}?">🗑️</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center" style="padding:40px;color:var(--text-light);">No subjects yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="modal-overlay" id="addSubjectModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">📚 Create Subject</span><div class="modal-close">✕</div></div>
+    <form method="POST" action="{{ url_for('admin_create_subject') }}">
+      <div class="modal-body">
+        <div class="form-row form-row-2">
+          <div class="form-group"><label class="form-label">Subject Name</label><input type="text" name="name" class="form-control" required></div>
+          <div class="form-group"><label class="form-label">Subject Code</label><input type="text" name="code" class="form-control" required placeholder="e.g. CS101"></div>
+        </div>
+        <div class="form-row form-row-2">
+          <div class="form-group"><label class="form-label">Assign Teacher</label><select name="teacher_id" class="form-control"><option value="">— Select —</option>{% for t in teachers %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}</select></div>
+          <div class="form-group"><label class="form-label">Assign Class</label><select name="class_id" class="form-control"><option value="">— Select —</option>{% for c in classes %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}</select></div>
+        </div>
+        <div class="form-row form-row-2">
+          <div class="form-group"><label class="form-label">Credits</label><input type="number" name="credits" class="form-control" value="3" min="1" max="6"></div>
+          <div class="form-group"><label class="form-label">Description</label><input type="text" name="description" class="form-control" placeholder="Brief description"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('addSubjectModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create Subject</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% block title %}{{ subject.name }} — ShikshyaHub{% endblock %}
+{% block role_label %}Student Portal{% endblock %}
+{% block page_title %}{{ subject.name }}{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('student_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Learning</div>
+<a href="{{ url_for('student_subjects') }}"><span class="nav-icon">📚</span> My Subjects</a>
+<a href="{{ url_for('student_tasks') }}"><span class="nav-icon">📝</span> Tasks
+  {% if notif_by_type.get('assignment') %}<span class="nav-badge">{{ notif_by_type['assignment'] }}</span>{% endif %}
+</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('student_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('student_results') }}"><span class="nav-icon">📊</span> Results
+  {% if notif_by_type.get('result') %}<span class="nav-badge">{{ notif_by_type['result'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('student_notices') }}"><span class="nav-icon">📢</span> Notices
+  {% if notif_by_type.get('notice') %}<span class="nav-badge">{{ notif_by_type['notice'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_fees') }}"><span class="nav-icon">💰</span> Fees
+  {% if notif_by_type.get('fee') %}<span class="nav-badge">{{ notif_by_type['fee'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_profile') }}"><span class="nav-icon">👤</span> Profile</a>
+{% endblock %}
+
+{% block content %}
+<!-- Subject Hero -->
+<div class="card mb-4" style="background:linear-gradient(135deg,var(--navy),var(--navy-light));color:#fff;">
+  <div class="card-body" style="padding:28px;">
+    <a href="{{ url_for('student_subjects') }}" style="color:rgba(255,255,255,.6);font-size:.82rem;display:inline-flex;align-items:center;gap:5px;margin-bottom:14px;">
+      ← Back to Subjects
+    </a>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+      <div>
+        <span class="badge" style="background:var(--gold);color:#fff;margin-bottom:10px;">{{ subject.code }}</span>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.9rem;color:#fff;margin-bottom:6px;">{{ subject.name }}</h2>
+        <p style="color:rgba(255,255,255,.7);font-size:.88rem;max-width:480px;">{{ subject.description or 'No description available.' }}</p>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="color:rgba(255,255,255,.55);font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Instructor</div>
+        <div style="font-weight:700;color:#fff;font-size:1rem;">{{ subject.teacher_name or 'TBA' }}</div>
+        <div class="badge" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);margin-top:8px;">{{ subject.class_name or 'Unassigned' }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick stats row -->
+{% set submitted_count = assignments | selectattr('submission_id') | list | length %}
+{% set pending_count   = assignments | rejectattr('submission_id') | list | length %}
+<div class="grid-3 mb-4">
+  <div style="background:var(--bg-card);border-radius:var(--radius-sm);padding:16px 20px;box-shadow:var(--shadow-sm);border-left:4px solid var(--info);">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:var(--navy);">{{ assignments|length }}</div>
+    <div style="font-size:.72rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.05em;">Total Tasks</div>
+  </div>
+  <div style="background:var(--bg-card);border-radius:var(--radius-sm);padding:16px 20px;box-shadow:var(--shadow-sm);border-left:4px solid var(--success);">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:var(--success);">{{ submitted_count }}</div>
+    <div style="font-size:.72rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.05em;">Submitted</div>
+  </div>
+  <div style="background:var(--bg-card);border-radius:var(--radius-sm);padding:16px 20px;box-shadow:var(--shadow-sm);border-left:4px solid var(--warning);">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:var(--warning);">{{ pending_count }}</div>
+    <div style="font-size:.72rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.05em;">Pending</div>
+  </div>
+</div>
+
+<div class="grid-2 mb-4">
+  <!-- Materials -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">📁 Learning Materials</span>
+      <span class="badge badge-navy">{{ materials|length }}</span>
+    </div>
+    <div style="max-height:300px;overflow-y:auto;">
+      {% for m in materials %}
+      <div style="padding:13px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+        <div style="width:36px;height:36px;border-radius:8px;background:var(--info-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          {% if m.file_type == 'pdf' %}📄
+          {% elif m.file_type in ('ppt','pptx') %}📊
+          {% elif m.file_type in ('doc','docx') %}📝
+          {% else %}📎{% endif %}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:.875rem;font-weight:600;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.title }}</div>
+          <div style="font-size:.72rem;color:var(--text-light);">{{ m.file_type|upper if m.file_type else 'File' }} · {{ m.uploaded_at[:10] }}</div>
+        </div>
+        {% if m.file_path %}
+        <a href="{{ url_for('serve_upload', folder='materials', filename=m.file_path) }}"
+           class="btn btn-sm btn-outline" download style="flex-shrink:0;">↓</a>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="empty-state"><div class="empty-icon">📁</div>No materials uploaded yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Teacher info -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">👨‍🏫 Subject Info</span></div>
+    <div class="card-body">
+      <div style="text-align:center;padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:16px;">
+        <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy-light));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;font-weight:700;margin:0 auto 10px;">
+          {{ (subject.teacher_name or 'T')[0].upper() }}
+        </div>
+        <div style="font-weight:700;color:var(--navy);">{{ subject.teacher_name or 'Not Assigned' }}</div>
+        <div style="font-size:.78rem;color:var(--text-light);">Subject Instructor</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:.82rem;">
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:var(--text-light);">Subject Code</span>
+          <span class="badge badge-gold">{{ subject.code }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:var(--text-light);">Credits</span>
+          <span style="font-weight:600;">{{ subject.credits or '—' }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:var(--text-light);">Class</span>
+          <span style="font-weight:600;">{{ subject.class_name or '—' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Assignments -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">📝 Assignments & Submissions</span>
+  </div>
+  {% for a in assignments %}
+  <div style="padding:20px 24px;border-bottom:1px solid var(--border);">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
+          <span style="font-size:1.1rem;">{{ '✅' if a.submission_id else '📝' }}</span>
+          <div style="font-weight:700;font-size:.95rem;color:var(--navy);">{{ a.title }}</div>
+        </div>
+        {% if a.description %}
+        <div style="font-size:.82rem;color:var(--text-secondary);margin-bottom:8px;line-height:1.55;">{{ a.description }}</div>
+        {% endif %}
+        <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:.78rem;color:var(--text-light);">
+          <span>📅 Due: <strong>{{ a.due_date or 'No deadline' }}</strong></span>
+          <span>📊 Max marks: <strong>{{ a.max_marks }}</strong></span>
+          {% if a.submission_id %}
+          <span>📤 Submitted: <strong>{{ a.submitted_at[:10] if a.submitted_at else 'Yes' }}</strong></span>
+          {% if a.marks is not none %}
+          <span>🎯 Grade: <strong style="color:var(--success);">{{ a.marks }}/{{ a.max_marks }}</strong></span>
+          {% endif %}
+          {% endif %}
+        </div>
+        {% if a.submission_id and a.feedback %}
+        <div style="margin-top:10px;padding:10px 14px;background:var(--info-light);border-radius:8px;font-size:.82rem;">
+          <strong>📣 Feedback:</strong> {{ a.feedback }}
+        </div>
+        {% endif %}
+        {% if a.submission_id and a.sub_file %}
+        <div style="margin-top:8px;">
+          <a href="{{ url_for('serve_upload', folder='assignments', filename=a.sub_file) }}"
+             class="btn btn-sm btn-outline" style="font-size:.75rem;" download>
+            📎 View my submission
+          </a>
+        </div>
+        {% endif %}
+        {% if a.submission_id and not a.sub_file %}
+        <div style="margin-top:8px;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:var(--success-light);border-radius:6px;font-size:.75rem;color:var(--success);">
+          ✓ Submitted (notes only)
+        </div>
+        {% endif %}
+      </div>
+      <div style="flex-shrink:0;">
+        {% if a.submission_id %}
+          <span class="badge badge-success" style="padding:6px 14px;font-size:.8rem;">✓ Submitted</span>
+        {% else %}
+          <button class="btn btn-gold btn-sm" onclick="openSubmitModal({{ a.id }}, '{{ a.title|replace("'","\'") }}', {{ a.max_marks }})">
+            📤 Submit
+          </button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="empty-icon">📝</div>No assignments for this subject yet.</div>
+  {% endfor %}
+</div>
+
+<!-- Submit Assignment Modal -->
+<div class="modal-overlay" id="submitModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="submitModalTitle">📤 Submit Assignment</span>
+      <div class="modal-close" onclick="closeModal('submitModal')">✕</div>
+    </div>
+    <form method="POST" action="{{ url_for('student_submit_assignment') }}" enctype="multipart/form-data" id="submitForm">
+      <input type="hidden" name="assignment_id" id="submitAssignmentId">
+      <div class="modal-body">
+        <div style="padding:12px 16px;background:var(--info-light);border-radius:8px;font-size:.82rem;color:var(--info);margin-bottom:18px;">
+          ℹ️ Submit your work as a PDF, DOCX, TXT, or add notes below.
+        </div>
+
+        <!-- File upload -->
+        <div class="form-group">
+          <label class="form-label">Upload File (PDF, DOCX, TXT)</label>
+          <div class="file-input-wrap">
+            <input type="file" name="file" id="submitFile"
+                   accept=".pdf,.doc,.docx,.txt,.ppt,.pptx">
+            <div class="file-icon">📎</div>
+            <div class="file-label">Click to choose file or drag here</div>
+            <div class="file-hint">Accepted: PDF, DOC, DOCX, TXT, PPT, PPTX · Max 10MB</div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group">
+          <label class="form-label">Notes / Comments (optional)</label>
+          <textarea name="notes" class="form-control" rows="3"
+                    placeholder="Add any notes about your submission..."></textarea>
+        </div>
+
+        <div id="submitMaxMarks" style="font-size:.78rem;color:var(--text-light);"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('submitModal')">Cancel</button>
+        <button type="submit" class="btn btn-gold">📤 Submit Assignment</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openSubmitModal(assignId, title, maxMarks) {
+  document.getElementById('submitModalTitle').textContent = '📤 Submit — ' + title;
+  document.getElementById('submitAssignmentId').value = assignId;
+  document.getElementById('submitMaxMarks').textContent = 'Maximum marks: ' + maxMarks;
+  openModal('submitModal');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Tasks — ShikshyaHub{% endblock %}
+{% block role_label %}Student Portal{% endblock %}
+{% block page_title %}My Tasks{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('student_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Learning</div>
+<a href="{{ url_for('student_subjects') }}"><span class="nav-icon">📚</span> My Subjects</a>
+<a href="{{ url_for('student_tasks') }}"><span class="nav-icon">📝</span> Tasks
+  {% if notif_by_type.get('assignment') %}<span class="nav-badge">{{ notif_by_type['assignment'] }}</span>{% endif %}
+</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('student_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('student_results') }}"><span class="nav-icon">📊</span> Results
+  {% if notif_by_type.get('result') %}<span class="nav-badge">{{ notif_by_type['result'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('student_notices') }}"><span class="nav-icon">📢</span> Notices
+  {% if notif_by_type.get('notice') %}<span class="nav-badge">{{ notif_by_type['notice'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_fees') }}"><span class="nav-icon">💰</span> Fees
+  {% if notif_by_type.get('fee') %}<span class="nav-badge">{{ notif_by_type['fee'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_profile') }}"><span class="nav-icon">👤</span> Profile</a>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>All Tasks</h1><p>{{ assignments|length }} assignments across all subjects</p></div>
+</div>
+
+<!-- Filter tabs -->
+<div style="display:flex;gap:8px;margin-bottom:20px;">
+  <button class="btn btn-sm btn-primary" onclick="filterTasks('all')">All ({{ assignments|length }})</button>
+  <button class="btn btn-sm btn-outline" onclick="filterTasks('pending')">Pending ({{ assignments|rejectattr('submission_id')|list|length }})</button>
+  <button class="btn btn-sm btn-outline" onclick="filterTasks('submitted')">Submitted ({{ assignments|selectattr('submission_id')|list|length }})</button>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px;" id="tasksList">
+  {% for a in assignments %}
+  <div class="card task-item {{ 'submitted-task' if a.submission_id else 'pending-task' }}">
+    <div class="card-body" style="padding:18px 24px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            {% if a.submission_id %}<span style="font-size:1.1rem;">✅</span>{% else %}<span style="font-size:1.1rem;">📝</span>{% endif %}
+            <div style="font-weight:700;font-size:.95rem;color:var(--navy);">{{ a.title }}</div>
+          </div>
+          <div style="font-size:.82rem;color:var(--text-light);margin-bottom:8px;">
+            📚 {{ a.subject_name }} · 📅 Due: {{ a.due_date or 'No deadline' }} · 📊 {{ a.max_marks }} marks
+          </div>
+          {% if a.submission_id %}
+          <div style="font-size:.8rem;color:var(--success);">Submitted {{ a.submitted_at[:10] if a.submitted_at else '' }}{% if a.marks is not none %} · <strong>{{ a.marks }}/{{ a.max_marks }}</strong>{% endif %}</div>
+          {% endif %}
+        </div>
+        <div>
+          {% if a.submission_id %}
+          <span class="badge badge-success">✓ Submitted</span>
+          {% else %}
+          <a href="{{ url_for('student_subject_detail', sid=a.subject_id if a.subject_id is defined else 0) }}" class="btn btn-sm btn-gold">Submit →</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="card" style="padding:48px;text-align:center;">
+    <div style="font-size:3rem;opacity:.3;">📝</div>
+    <p style="color:var(--text-light);margin-top:12px;">No assignments yet.</p>
+  </div>
+  {% endfor %}
+</div>
+{% block extra_js %}
+<script>
+function filterTasks(filter) {
+  document.querySelectorAll('.task-item').forEach(item => {
+    if (filter === 'all') item.style.display='';
+    else if (filter === 'pending') item.style.display = item.classList.contains('pending-task') ? '' : 'none';
+    else item.style.display = item.classList.contains('submitted-task') ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}
+{% endblock %}

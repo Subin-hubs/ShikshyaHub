@@ -1,15 +1,32 @@
+#!/usr/bin/env python3
+"""
+ShikshyaHub Setup Script
+Run this to initialize the database and start the server
+"""
+import subprocess
+import sys
 import os
 
-# This tells the computer to create the structure for ShikshyaHub
-folders = ['app/routes', 'app/templates/auth', 'app/templates/student', 
-           'app/templates/teacher', 'app/templates/admin', 'app/templates/public', 
-           'app/templates/includes', 'app/static/css', 'app/static/js', 
-           'app/static/uploads/assignments', 'app/utils']
+def install_requirements():
+    print("📦 Installing requirements...")
+    subprocess.run([sys.executable, '-m', 'pip', 'install', '--break-system-packages',
+                    'flask', 'qrcode', 'pillow'], check=True, capture_output=True)
+    print("✅ Requirements installed!")
 
-files = ['.env', 'config.py', 'run.py', 'requirements.txt', 'app/__init__.py', 
-         'app/models.py', 'app/forms.py', 'app/routes/auth.py', 'app/routes/main.py']
+def initialize_db():
+    print("🗄️  Initializing database...")
+    sys.path.insert(0, os.path.dirname(__file__))
+    from app import init_db
+    init_db()
+    print("✅ Database initialized!")
+    print("\n🔐 Demo Credentials:")
+    print("   Admin:   admin@shikshyahub.edu / Admin@123")
+    print("   Teacher: teacher@shikshyahub.edu / Teacher@123")
+    print("   Student: student@shikshyahub.edu / Student@123")
 
-for f in folders: os.makedirs(f, exist_ok=True)
-for f in files: open(f, 'a').close()
-
-print("Project structure created!")
+if __name__ == '__main__':
+    install_requirements()
+    initialize_db()
+    print("\n🚀 Starting ShikshyaHub...")
+    print("   Open http://localhost:5000 in your browser")
+    os.system(f'{sys.executable} app.py')

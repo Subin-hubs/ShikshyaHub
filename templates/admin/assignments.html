@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Assignments — ShikshyaHub{% endblock %}
+{% block role_label %}Admin Panel{% endblock %}
+{% block page_title %}Assignment Monitoring{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('admin_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Management</div>
+<a href="{{ url_for('admin_students') }}"><span class="nav-icon">🎓</span> Students</a>
+<a href="{{ url_for('admin_teachers') }}"><span class="nav-icon">👨‍🏫</span> Teachers</a>
+<a href="{{ url_for('admin_subjects') }}"><span class="nav-icon">📚</span> Subjects</a>
+<a href="{{ url_for('admin_classes') }}"><span class="nav-icon">🏛</span> Classes & Programs</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('admin_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<a href="{{ url_for('admin_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('admin_assignments') }}" class="active"><span class="nav-icon">📝</span> Assignments</a>
+<a href="{{ url_for('admin_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('admin_notices') }}"><span class="nav-icon">📢</span> Notices</a>
+<a href="{{ url_for('admin_fees') }}"><span class="nav-icon">💰</span> Fees</a>
+{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Assignment Monitoring</h1><p>{{ assignments|length }} total assignments</p></div></div>
+<div class="card">
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Assignment</th><th>Subject</th><th>Teacher</th><th>Due Date</th><th>Max Marks</th><th>Submissions</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for a in assignments %}
+        <tr>
+          <td style="font-weight:600;color:var(--navy);">{{ a.title }}</td>
+          <td>{{ a.subject_name }}</td>
+          <td style="color:var(--text-secondary);">{{ a.teacher_name or '—' }}</td>
+          <td style="font-size:.82rem;">{{ a.due_date or '—' }}</td>
+          <td>{{ a.max_marks }}</td>
+          <td><span class="badge badge-info">{{ a.submission_count }} submitted</span></td>
+          <td>{% if a.due_date and a.due_date < 'today' %}<span class="badge badge-danger">Overdue</span>{% else %}<span class="badge badge-success">Active</span>{% endif %}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center" style="padding:40px;color:var(--text-light);">No assignments yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

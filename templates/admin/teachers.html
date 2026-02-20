@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Teachers — ShikshyaHub{% endblock %}
+{% block role_label %}Admin Panel{% endblock %}
+{% block page_title %}Teachers{% endblock %}
+
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('admin_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Management</div>
+<a href="{{ url_for('admin_students') }}"><span class="nav-icon">🎓</span> Students</a>
+<a href="{{ url_for('admin_teachers') }}" class="active"><span class="nav-icon">👨‍🏫</span> Teachers</a>
+<a href="{{ url_for('admin_subjects') }}"><span class="nav-icon">📚</span> Subjects</a>
+<a href="{{ url_for('admin_classes') }}"><span class="nav-icon">🏛</span> Classes & Programs</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('admin_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<a href="{{ url_for('admin_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('admin_assignments') }}"><span class="nav-icon">📝</span> Assignments</a>
+<a href="{{ url_for('admin_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('admin_notices') }}"><span class="nav-icon">📢</span> Notices</a>
+<a href="{{ url_for('admin_fees') }}"><span class="nav-icon">💰</span> Fees</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Teachers Management</h1>
+    <p>{{ teachers|length }} teachers on staff</p>
+  </div>
+  <button class="btn btn-gold" onclick="openModal('addTeacherModal')">+ Add Teacher</button>
+</div>
+
+<div class="grid-auto mb-4">
+  {% for t in teachers %}
+  <div class="card" style="padding:24px;text-align:center;">
+    <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy-light));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.4rem;font-weight:700;margin:0 auto 12px;">{{ t.name[0].upper() }}</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:var(--navy);margin-bottom:4px;">{{ t.name }}</div>
+    <div style="font-size:.8rem;color:var(--text-light);margin-bottom:10px;">{{ t.email }}</div>
+    <span class="badge badge-navy" style="margin-bottom:14px;">{{ t.subject_count }} Subject{{ 's' if t.subject_count != 1 }}</span>
+    <div style="display:flex;gap:8px;justify-content:center;">
+      <form method="POST" action="{{ url_for('admin_delete_teacher', tid=t.id) }}">
+        <button type="submit" class="btn btn-sm btn-danger" data-confirm="Delete {{ t.name }}?">🗑️ Delete</button>
+      </form>
+    </div>
+  </div>
+  {% else %}
+  <div class="card" style="padding:48px;text-align:center;grid-column:1/-1;">
+    <div style="font-size:3rem;opacity:.3;margin-bottom:12px;">👨‍🏫</div>
+    <p style="color:var(--text-light);">No teachers found. Add a teacher to get started.</p>
+    <button class="btn btn-gold mt-3" onclick="openModal('addTeacherModal')">+ Add First Teacher</button>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-title">👨‍🏫 All Teachers</span></div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Subjects</th><th>Joined</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for t in teachers %}
+        <tr>
+          <td style="color:var(--text-light);">{{ loop.index }}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:700;">{{ t.name[0].upper() }}</div>
+              <span style="font-weight:600;color:var(--navy);">{{ t.name }}</span>
+            </div>
+          </td>
+          <td style="color:var(--text-secondary);font-size:.875rem;">{{ t.email }}</td>
+          <td><span class="badge badge-gold">{{ t.subject_count }} subjects</span></td>
+          <td style="font-size:.82rem;color:var(--text-light);">{{ t.created_at[:10] }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('admin_delete_teacher', tid=t.id) }}" style="display:inline;">
+              <button type="submit" class="btn btn-sm btn-danger" data-confirm="Delete {{ t.name }}?">🗑️ Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add Teacher Modal -->
+<div class="modal-overlay" id="addTeacherModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">👨‍🏫 Create Teacher Account</span>
+      <div class="modal-close">✕</div>
+    </div>
+    <form method="POST" action="{{ url_for('admin_create_teacher') }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="name" class="form-control" required placeholder="e.g. Dr. Sarah Johnson">
+        </div>
+        <div class="form-row form-row-2">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="text" name="password" class="form-control" required>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('addTeacherModal')">Cancel</button>
+        <button type="submit" class="btn btn-gold">Create Teacher</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}Attendance — ShikshyaHub{% endblock %}
+{% block role_label %}Teacher Portal{% endblock %}
+{% block page_title %}Attendance Management{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('teacher_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Teaching</div>
+<a href="{{ url_for('teacher_subjects') }}"><span class="nav-icon">📚</span> My Subjects</a>
+<a href="{{ url_for('teacher_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('teacher_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Communication</div>
+<a href="{{ url_for('teacher_notices') }}"><span class="nav-icon">📢</span> Notices
+  {% if notif_by_type.get('notice') %}<span class="nav-badge">{{ notif_by_type['notice'] }}</span>{% endif %}
+</a>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Attendance Management</h1><p>Mark and view student attendance</p></div>
+  <button class="btn btn-primary" onclick="openModal('markAttModal')">✅ Mark Attendance</button>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header"><span class="card-title">📋 Recent Attendance Records</span></div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Student</th><th>Subject</th><th>Date</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for a in attendance %}
+        <tr>
+          <td style="font-weight:600;color:var(--navy);">{{ a.student_name }}</td>
+          <td>{{ a.subject_name }}</td>
+          <td style="font-size:.82rem;color:var(--text-light);">{{ a.date }}</td>
+          <td>
+            {% if a.status=='present' %}<span class="badge badge-success">✓ Present</span>
+            {% elif a.status=='absent' %}<span class="badge badge-danger">✗ Absent</span>
+            {% else %}<span class="badge badge-warning">⚠ Late</span>{% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center" style="padding:30px;color:var(--text-light);">No records yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-overlay" id="markAttModal">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-header"><span class="modal-title">✅ Mark Attendance</span><div class="modal-close">✕</div></div>
+    <form method="POST" action="{{ url_for('teacher_mark_attendance') }}">
+      <div class="modal-body">
+        <div class="form-row form-row-2">
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <select name="subject_id" class="form-control" required id="subjectSelect" onchange="loadStudents(this.value)">
+              <option value="">— Select Subject —</option>
+              {% for s in subjects %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" name="date" class="form-control" required id="attDateInput">
+          </div>
+        </div>
+        <div id="studentsSection" style="display:none;">
+          <div style="font-size:.85rem;font-weight:700;color:var(--navy);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em;">Student Attendance</div>
+          <div id="studentsList"></div>
+        </div>
+        {% for s in students %}
+        <div class="student-data" data-student-id="{{ s.id }}" data-student-name="{{ s.name }}" style="display:none;"></div>
+        {% endfor %}
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('markAttModal')">Cancel</button><button type="submit" class="btn btn-primary" id="submitAtt" disabled>Mark Attendance</button></div>
+    </form>
+  </div>
+</div>
+{% block extra_js %}
+<script>
+const allStudents = [
+  {% for s in students %}{"id": {{ s.id }}, "name": "{{ s.name }}"},{% endfor %}
+];
+
+function loadStudents(subjectId) {
+  const section = document.getElementById('studentsSection');
+  const list = document.getElementById('studentsList');
+  const btn = document.getElementById('submitAtt');
+  if (!subjectId) { section.style.display='none'; btn.disabled=true; return; }
+  section.style.display='block'; btn.disabled=false;
+  list.innerHTML = allStudents.map(s => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.75rem;font-weight:700;">${s.name[0]}</div>
+        <span style="font-size:.875rem;font-weight:500;color:var(--navy);">${s.name}</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <input type="hidden" name="student_ids[]" value="${s.id}">
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="status_${s.id}" value="present" checked onchange="setStatus(this,'present',${s.id})"><span class="badge badge-success" style="cursor:pointer;">Present</span></label>
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="status_${s.id}" value="absent" onchange="setStatus(this,'absent',${s.id})"><span class="badge badge-danger" style="cursor:pointer;">Absent</span></label>
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="status_${s.id}" value="late" onchange="setStatus(this,'late',${s.id})"><span class="badge badge-warning" style="cursor:pointer;">Late</span></label>
+        <input type="hidden" name="statuses[]" value="present" id="statusHidden_${s.id}">
+      </div>
+    </div>
+  `).join('');
+}
+
+function setStatus(radio, status, studentId) {
+  document.getElementById('statusHidden_'+studentId).value = status;
+}
+// Set today's date
+const di = document.getElementById('attDateInput');
+if (di) di.value = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}
+{% endblock %}

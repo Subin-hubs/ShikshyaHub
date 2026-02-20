@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}Fees — ShikshyaHub{% endblock %}
+{% block role_label %}Admin Panel{% endblock %}
+{% block page_title %}Fee Management{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('admin_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Management</div>
+<a href="{{ url_for('admin_students') }}"><span class="nav-icon">🎓</span> Students</a>
+<a href="{{ url_for('admin_teachers') }}"><span class="nav-icon">👨‍🏫</span> Teachers</a>
+<a href="{{ url_for('admin_subjects') }}"><span class="nav-icon">📚</span> Subjects</a>
+<a href="{{ url_for('admin_classes') }}"><span class="nav-icon">🏛</span> Classes & Programs</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('admin_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<a href="{{ url_for('admin_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('admin_assignments') }}"><span class="nav-icon">📝</span> Assignments</a>
+<a href="{{ url_for('admin_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('admin_notices') }}"><span class="nav-icon">📢</span> Notices</a>
+<a href="{{ url_for('admin_fees') }}" class="active"><span class="nav-icon">💰</span> Fees</a>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Fee Management</h1><p>Track and manage all student fees</p></div>
+  <button class="btn btn-primary" onclick="openModal('addFeeModal')">+ Add Fee Record</button>
+</div>
+{% if overview %}
+<div class="grid-3 mb-4">
+  <div class="stat-card"><div class="icon stat-icon-navy">💰</div><div><div class="stat-val">Rs. {{ '{:,.0f}'.format(overview.total or 0) }}</div><div class="stat-label">Total Fees</div></div></div>
+  <div class="stat-card"><div class="icon stat-icon-green">✅</div><div><div class="stat-val">Rs. {{ '{:,.0f}'.format(overview.paid or 0) }}</div><div class="stat-label">Collected</div></div></div>
+  <div class="stat-card"><div class="icon" style="background:var(--danger-light);">⏳</div><div><div class="stat-val">Rs. {{ '{:,.0f}'.format((overview.total or 0) - (overview.paid or 0)) }}</div><div class="stat-label">Pending</div></div></div>
+</div>
+{% endif %}
+<div class="card">
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Student</th><th>Semester</th><th>Total Fee</th><th>Paid</th><th>Pending</th><th>Due Date</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for f in fees %}
+        <tr>
+          <td style="font-weight:600;color:var(--navy);">{{ f.student_name }}</td>
+          <td>Semester {{ f.semester }}</td>
+          <td>Rs. {{ '{:,.0f}'.format(f.total_fee) }}</td>
+          <td style="color:var(--success);font-weight:600;">Rs. {{ '{:,.0f}'.format(f.paid_amount) }}</td>
+          <td style="color:var(--danger);font-weight:600;">Rs. {{ '{:,.0f}'.format(f.total_fee - f.paid_amount) }}</td>
+          <td style="font-size:.82rem;color:var(--text-light);">{{ f.due_date or '—' }}</td>
+          <td>
+            {% if f.status=='paid' %}<span class="badge badge-success">Paid</span>
+            {% elif f.status=='partial' %}<span class="badge badge-warning">Partial</span>
+            {% elif f.status=='overdue' %}<span class="badge badge-danger">Overdue</span>
+            {% else %}<span class="badge badge-info">Pending</span>{% endif %}
+          </td>
+          <td>
+            <button class="btn btn-sm btn-success" onclick="openPayModal({{ f.id }}, '{{ f.student_name }}')">💳 Pay</button>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center" style="padding:40px;color:var(--text-light);">No fee records yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addFeeModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">💰 Add Fee Record</span><div class="modal-close">✕</div></div>
+    <form method="POST" action="{{ url_for('admin_create_fee') }}">
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Student</label><select name="student_id" class="form-control" required><option value="">— Select Student —</option>{% for s in students %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select></div>
+        <div class="form-row form-row-2">
+          <div class="form-group"><label class="form-label">Semester</label><select name="semester" class="form-control">{% for i in range(1,9) %}<option value="{{ i }}">Semester {{ i }}</option>{% endfor %}</select></div>
+          <div class="form-group"><label class="form-label">Total Fee (Rs.)</label><input type="number" name="total_fee" class="form-control" required placeholder="50000"></div>
+        </div>
+        <div class="form-row form-row-2">
+          <div class="form-group"><label class="form-label">Paid Amount (Rs.)</label><input type="number" name="paid_amount" class="form-control" value="0"></div>
+          <div class="form-group"><label class="form-label">Due Date</label><input type="date" name="due_date" class="form-control"></div>
+        </div>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('addFeeModal')">Cancel</button><button type="submit" class="btn btn-primary">Create Record</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="payModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="payModalTitle">💳 Record Payment</span><div class="modal-close" onclick="closeModal('payModal')">✕</div></div>
+    <form method="POST" id="payForm">
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Payment Amount (Rs.)</label><input type="number" name="amount" class="form-control" required min="1"></div>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('payModal')">Cancel</button><button type="submit" class="btn btn-success">Record Payment</button></div>
+    </form>
+  </div>
+</div>
+{% block extra_js %}
+<script>
+function openPayModal(feeId, studentName) {
+  document.getElementById('payModalTitle').textContent = '💳 Record Payment — ' + studentName;
+  document.getElementById('payForm').action = '/admin/fees/pay/' + feeId;
+  openModal('payModal');
+}
+</script>
+{% endblock %}
+{% endblock %}

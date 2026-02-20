@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShikshyaHub — Professional Student Portal</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+  <script>
+    // Apply saved theme immediately to prevent flash
+    (function() {
+      const t = localStorage.getItem('shikshyahub-theme') || 'light';
+      document.getElementById('htmlRoot') ? document.getElementById('htmlRoot').setAttribute('data-theme', t) : null;
+      document.addEventListener('DOMContentLoaded', function() {
+        document.documentElement.setAttribute('data-theme', t);
+      });
+    })();
+  </script>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar" id="navbar">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">S</div>
+    Shikshya<span>Hub</span>
+  </div>
+  <div class="nav-links">
+    <a href="#home">Home</a>
+    <a href="#about">About Us</a>
+    <a href="#services">Services</a>
+    <a href="#courses">Courses</a>
+    <a href="#contact">Contact</a>
+    <a href="#support">Support</a>
+  </div>
+  <div class="nav-right">
+    <button class="nav-theme-toggle" id="themeToggle" title="Toggle dark/light mode">🌙</button>
+    <a href="{{ url_for('login') }}" class="btn-login">Login →</a>
+    <div class="nav-toggle" id="navToggle">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button id="menuClose" style="position:absolute;top:22px;right:22px;font-size:1.5rem;background:none;border:none;cursor:pointer;color:#1a202c;">✕</button>
+  <a href="#home">Home</a>
+  <a href="#about">About Us</a>
+  <a href="#services">Services</a>
+  <a href="#courses">Courses</a>
+  <a href="#contact">Contact</a>
+  <a href="#support">Support</a>
+  <a href="{{ url_for('login') }}" style="background:var(--navy);color:#fff;padding:12px 32px;border-radius:10px;font-weight:700;">Login</a>
+</div>
+
+<!-- ── HERO ── -->
+<section class="hero" id="home">
+  <div class="hero-container">
+    <div class="hero-grid">
+      <div class="hero-left">
+        <div class="hero-eyebrow">Nepal's Premier Education Portal</div>
+        <h1 class="hero-title">
+          Welcome to<br><em>ShikshyaHub</em>
+        </h1>
+        <p class="hero-sub">A powerful, all-in-one academic management platform designed for modern educational institutions — connecting students, teachers, and administrators in one seamless digital ecosystem.</p>
+        <div class="hero-cta">
+          <a href="{{ url_for('login') }}" class="btn-hero-primary">Get Started →</a>
+          <a href="#about" class="btn-hero-outline">Learn More</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-num" data-target="5000">0</div>
+            <div class="hero-stat-label">Students</div>
+          </div>
+          <div class="hero-stat-sep"></div>
+          <div class="hero-stat">
+            <div class="hero-stat-num" data-target="200">0</div>
+            <div class="hero-stat-label">Teachers</div>
+          </div>
+          <div class="hero-stat-sep"></div>
+          <div class="hero-stat">
+            <div class="hero-stat-num" data-target="50">0</div>
+            <div class="hero-stat-label">Programs</div>
+          </div>
+          <div class="hero-stat-sep"></div>
+          <div class="hero-stat">
+            <div class="hero-stat-num" data-target="98">0</div>
+            <div class="hero-stat-label">% Satisfaction</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="hero-image-card">
+          <svg viewBox="0 0 430 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;border-radius:14px;">
+            <rect width="430" height="320" fill="#1a2f57"/>
+            <rect x="20" y="20" width="390" height="50" rx="8" fill="rgba(255,255,255,.08)"/>
+            <rect x="30" y="33" width="120" height="24" rx="4" fill="rgba(196,150,42,.8)"/>
+            <rect x="20" y="90" width="185" height="100" rx="8" fill="rgba(255,255,255,.07)"/>
+            <rect x="215" y="90" width="195" height="100" rx="8" fill="rgba(255,255,255,.07)"/>
+            <rect x="30" y="103" width="80" height="10" rx="4" fill="rgba(255,255,255,.3)"/>
+            <rect x="30" y="120" width="160" height="30" rx="4" fill="rgba(196,150,42,.6)"/>
+            <rect x="30" y="158" width="100" height="8" rx="3" fill="rgba(255,255,255,.2)"/>
+            <rect x="225" y="103" width="80" height="10" rx="4" fill="rgba(255,255,255,.3)"/>
+            <rect x="225" y="120" width="160" height="30" rx="4" fill="rgba(56,161,105,.6)"/>
+            <rect x="225" y="158" width="100" height="8" rx="3" fill="rgba(255,255,255,.2)"/>
+            <rect x="20" y="210" width="390" height="50" rx="8" fill="rgba(255,255,255,.06)"/>
+            <rect x="30" y="222" width="60" height="10" rx="3" fill="rgba(255,255,255,.25)"/>
+            <rect x="30" y="238" width="300" height="8" rx="3" fill="rgba(255,255,255,.12)"/>
+            <rect x="20" y="272" width="125" height="30" rx="8" fill="rgba(196,150,42,.8)"/>
+            <rect x="155" y="272" width="125" height="30" rx="8" fill="rgba(255,255,255,.1)"/>
+            <text x="30" y="293" fill="rgba(255,255,255,.9)" font-family="DM Sans" font-size="12" font-weight="700">View Dashboard</text>
+          </svg>
+        </div>
+        <div class="hero-image-badge">🎓 Digital Learning Hub</div>
+        <div class="hero-image-badge2">✓ Trusted by 50+ Institutions</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ABOUT ── -->
+<section class="about" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="reveal">
+        <div class="section-eyebrow" style="color:var(--gold-light);">About ShikshyaHub</div>
+        <h2 class="section-title">Empowering Education Through Innovation</h2>
+        <p style="color:rgba(255,255,255,.65);line-height:1.75;margin-bottom:24px;font-size:.95rem;">ShikshyaHub is a comprehensive educational management system built specifically for Nepali educational institutions. We bridge the gap between traditional classroom learning and modern digital education.</p>
+        <p style="color:rgba(255,255,255,.65);line-height:1.75;font-size:.95rem;">From attendance tracking to fee management, from assignment grading to result publishing — ShikshyaHub handles it all with elegance and precision.</p>
+        <div style="margin-top:28px;">
+          <a href="{{ url_for('login') }}" style="display:inline-flex;align-items:center;gap:8px;padding:12px 26px;background:var(--gold);color:#fff;border-radius:10px;font-weight:700;font-size:.9rem;transition:all .25s;">
+            Access Portal →
+          </a>
+        </div>
+      </div>
+      <div class="about-features reveal reveal-delay-1">
+        <div class="about-feat">
+          <div class="about-feat-icon">📊</div>
+          <div>
+            <div class="about-feat-title">Real-Time Analytics</div>
+            <div class="about-feat-desc">Track attendance, performance, and fee collection with live dashboards and insightful charts.</div>
+          </div>
+        </div>
+        <div class="about-feat">
+          <div class="about-feat-icon">🔐</div>
+          <div>
+            <div class="about-feat-title">Role-Based Access</div>
+            <div class="about-feat-desc">Admin, Teacher, and Student portals with tailored features and secure authentication.</div>
+          </div>
+        </div>
+        <div class="about-feat">
+          <div class="about-feat-icon">📱</div>
+          <div>
+            <div class="about-feat-title">Fully Responsive</div>
+            <div class="about-feat-desc">Access ShikshyaHub on any device — desktop, tablet, or smartphone, anywhere, anytime.</div>
+          </div>
+        </div>
+        <div class="about-feat">
+          <div class="about-feat-icon">📄</div>
+          <div>
+            <div class="about-feat-title">Smart Reports</div>
+            <div class="about-feat-desc">Generate and download detailed reports for attendance, results, fees, and more in PDF format.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SERVICES ── -->
+<section class="services" id="services">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-eyebrow">Our Services</div>
+      <h2 class="section-title">Everything Your Institution Needs</h2>
+      <p class="section-sub">A complete suite of tools for managing every aspect of your educational institution efficiently.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-icon">🏫</div>
+        <div class="service-title">Student Management</div>
+        <p class="service-desc">Comprehensive student profiles, enrollment management, class assignments, and academic history — all in one place.</p>
+      </div>
+      <div class="service-card reveal reveal-delay-1">
+        <div class="service-icon">👨‍🏫</div>
+        <div class="service-title">Teacher Portal</div>
+        <p class="service-desc">Empower teachers with tools for attendance, assignments, grading, and subject material uploads.</p>
+      </div>
+      <div class="service-card reveal reveal-delay-2">
+        <div class="service-icon">📅</div>
+        <div class="service-title">Timetable Scheduler</div>
+        <p class="service-desc">Intelligent timetable creation with conflict detection, room assignments, and visual weekly views.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">✅</div>
+        <div class="service-title">Attendance System</div>
+        <p class="service-desc">QR code attendance, manual marking, correction approvals, and comprehensive attendance reports.</p>
+      </div>
+      <div class="service-card reveal reveal-delay-1">
+        <div class="service-icon">📝</div>
+        <div class="service-title">Results Management</div>
+        <p class="service-desc">Upload marks, calculate GPA, publish results to students, and generate semester report cards.</p>
+      </div>
+      <div class="service-card reveal reveal-delay-2">
+        <div class="service-icon">💰</div>
+        <div class="service-title">Fee Management</div>
+        <p class="service-desc">Set fee structures, record payments, track pending dues, send reminders, and download receipts.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── COURSES ── -->
+<section id="courses" style="padding:90px 5%;background:#fff;">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-eyebrow">Supported Programs</div>
+      <h2 class="section-title">Academic Programs We Manage</h2>
+      <p class="section-sub">ShikshyaHub supports a wide variety of academic programs across disciplines.</p>
+    </div>
+    <div class="courses-grid">
+      <div class="course-card reveal">
+        <div class="course-header" style="background:linear-gradient(135deg,#1a2f57,#0f1f3d);">💻</div>
+        <div class="course-body">
+          <div class="course-tag">Technology</div>
+          <div class="course-title">Bachelor of Computer Science</div>
+          <div class="course-meta"><span>📅 4 Years</span><span>📚 8 Semesters</span></div>
+        </div>
+      </div>
+      <div class="course-card reveal reveal-delay-1">
+        <div class="course-header" style="background:linear-gradient(135deg,#2d3748,#1a202c);">⚙️</div>
+        <div class="course-body">
+          <div class="course-tag">Engineering</div>
+          <div class="course-title">Bachelor of Engineering</div>
+          <div class="course-meta"><span>📅 4 Years</span><span>📚 8 Semesters</span></div>
+        </div>
+      </div>
+      <div class="course-card reveal reveal-delay-2">
+        <div class="course-header" style="background:linear-gradient(135deg,#2c5282,#2b6cb0);">💼</div>
+        <div class="course-body">
+          <div class="course-tag">Business</div>
+          <div class="course-title">Bachelor of Business Administration</div>
+          <div class="course-meta"><span>📅 4 Years</span><span>📚 8 Semesters</span></div>
+        </div>
+      </div>
+      <div class="course-card reveal">
+        <div class="course-header" style="background:linear-gradient(135deg,#276749,#2f855a);">🏥</div>
+        <div class="course-body">
+          <div class="course-tag">Health</div>
+          <div class="course-title">Bachelor of Health Sciences</div>
+          <div class="course-meta"><span>📅 4 Years</span><span>📚 8 Semesters</span></div>
+        </div>
+      </div>
+      <div class="course-card reveal reveal-delay-1">
+        <div class="course-header" style="background:linear-gradient(135deg,#702459,#97266d);">🎨</div>
+        <div class="course-body">
+          <div class="course-tag">Arts & Design</div>
+          <div class="course-title">Bachelor of Fine Arts</div>
+          <div class="course-meta"><span>📅 4 Years</span><span>📚 8 Semesters</span></div>
+        </div>
+      </div>
+      <div class="course-card reveal reveal-delay-2">
+        <div class="course-header" style="background:linear-gradient(135deg,#744210,#c05621);">🔬</div>
+        <div class="course-body">
+          <div class="course-tag">Science</div>
+          <div class="course-title">Bachelor of Science</div>
+          <div class="course-meta"><span>📅 4 Years</span><span>📚 8 Semesters</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ── -->
+<section class="contact" id="contact">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-eyebrow">Contact Us</div>
+      <h2 class="section-title">Get In Touch With Us</h2>
+      <p class="section-sub">Have questions or need a demo? We're here to help you transform your institution.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="reveal">
+        <div class="contact-info-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <div style="font-weight:700;color:var(--navy);margin-bottom:4px;">Office Address</div>
+            <div style="font-size:.875rem;color:var(--text-2);">Kathmandu, Bagmati Province, Nepal<br>Lalitpur, 44700</div>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <div style="font-weight:700;color:var(--navy);margin-bottom:4px;">Phone</div>
+            <div style="font-size:.875rem;color:var(--text-2);">+977-01-4xxxxxx<br>+977-98xxxxxxxx</div>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-icon">✉️</div>
+          <div>
+            <div style="font-weight:700;color:var(--navy);margin-bottom:4px;">Email</div>
+            <div style="font-size:.875rem;color:var(--text-2);">info@shikshyahub.edu.np<br>support@shikshyahub.edu.np</div>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-icon">🕐</div>
+          <div>
+            <div style="font-weight:700;color:var(--navy);margin-bottom:4px;">Office Hours</div>
+            <div style="font-size:.875rem;color:var(--text-2);">Sunday – Friday: 9:00 AM – 5:00 PM<br>Saturday: Closed</div>
+          </div>
+        </div>
+      </div>
+      <div class="contact-form-wrap reveal reveal-delay-1">
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--navy);margin-bottom:20px;">Send a Message</h3>
+        <form class="contact-form" id="contactForm">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <input type="text" class="form-input" placeholder="Your Name" required>
+            <input type="email" class="form-input" placeholder="Your Email" required>
+          </div>
+          <input type="text" class="form-input" placeholder="Institution Name">
+          <input type="text" class="form-input" placeholder="Subject">
+          <textarea class="form-input" rows="4" placeholder="Your message..." required style="resize:vertical;"></textarea>
+          <button type="submit" class="btn-send">Send Message →</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SUPPORT ── -->
+<section class="support" id="support">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-eyebrow" style="color:var(--gold-light);">Support Center</div>
+      <h2 class="section-title" style="color:#fff;">We're Here to Help</h2>
+    </div>
+    <div class="support-cards">
+      <div class="support-card reveal">
+        <div class="support-card-icon">📖</div>
+        <div class="support-card-title">Documentation</div>
+        <div class="support-card-desc">Comprehensive guides and tutorials to help you get the most out of ShikshyaHub.</div>
+        <div style="margin-top:16px;"><a href="#" style="color:var(--gold-light);font-size:.85rem;font-weight:700;">Read Docs →</a></div>
+      </div>
+      <div class="support-card reveal reveal-delay-1">
+        <div class="support-card-icon">💬</div>
+        <div class="support-card-title">Live Chat</div>
+        <div class="support-card-desc">Chat with our support team in real-time for quick answers and troubleshooting assistance.</div>
+        <div style="margin-top:16px;"><a href="#" style="color:var(--gold-light);font-size:.85rem;font-weight:700;">Start Chat →</a></div>
+      </div>
+      <div class="support-card reveal reveal-delay-2">
+        <div class="support-card-icon">🎥</div>
+        <div class="support-card-title">Video Tutorials</div>
+        <div class="support-card-desc">Step-by-step video walkthroughs for all features, from setup to advanced configurations.</div>
+        <div style="margin-top:16px;"><a href="#" style="color:var(--gold-light);font-size:.85rem;font-weight:700;">Watch Videos →</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand">Shikshya<span>Hub</span></div>
+      <div class="footer-desc">Nepal's professional student portal system — connecting institutions, teachers, and students through powerful digital tools.</div>
+      <div style="display:flex;gap:12px;">
+        <a href="#" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:.9rem;color:rgba(255,255,255,.7);transition:background .25s;">📘</a>
+        <a href="#" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:.9rem;color:rgba(255,255,255,.7);transition:background .25s;">🐦</a>
+        <a href="#" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:.9rem;color:rgba(255,255,255,.7);transition:background .25s;">💼</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Quick Links</div>
+      <a href="#home">Home</a>
+      <a href="#about">About Us</a>
+      <a href="#services">Services</a>
+      <a href="#courses">Courses</a>
+      <a href="{{ url_for('login') }}">Login</a>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Portals</div>
+      <a href="{{ url_for('login') }}">Student Portal</a>
+      <a href="{{ url_for('login') }}">Teacher Portal</a>
+      <a href="{{ url_for('login') }}">Admin Panel</a>
+      <a href="#">API Access</a>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Support</div>
+      <a href="#support">Help Center</a>
+      <a href="#contact">Contact Us</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Sitemap</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2024 ShikshyaHub. All rights reserved. | Made with ❤️ for Nepali Education</p>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+<script>
+// ── Dark mode for landing page ──
+(function(){
+  const saved = localStorage.getItem('shikshyahub-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = saved === 'dark' ? '☀️' : '🌙';
+})();
+document.getElementById('themeToggle').addEventListener('click', function(){
+  const html = document.documentElement;
+  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('shikshyahub-theme', next);
+  this.textContent = next === 'dark' ? '☀️' : '🌙';
+});
+</script>
+</body>
+</html>

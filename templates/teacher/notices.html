@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Notices — ShikshyaHub{% endblock %}
+{% block role_label %}Teacher Portal{% endblock %}
+{% block page_title %}Notices{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('teacher_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Teaching</div>
+<a href="{{ url_for('teacher_subjects') }}"><span class="nav-icon">📚</span> My Subjects</a>
+<a href="{{ url_for('teacher_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('teacher_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Communication</div>
+<a href="{{ url_for('teacher_notices') }}"><span class="nav-icon">📢</span> Notices
+  {% if notif_by_type.get('notice') %}<span class="nav-badge">{{ notif_by_type['notice'] }}</span>{% endif %}
+</a>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Notice Board</h1><p>{{ notices|length }} notices</p></div>
+  <button class="btn btn-primary" onclick="openModal('addNoticeModal')">+ Post Notice</button>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;">
+  {% for n in notices %}
+  <div class="card">
+    <div class="card-body">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+        <div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:var(--navy);margin-bottom:6px;">{{ n.title }}</div>
+          <p style="font-size:.875rem;color:var(--text-secondary);line-height:1.65;">{{ n.content }}</p>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          {% if n.audience=='all' %}<span class="badge badge-gold">All</span>{% elif n.audience=='students' %}<span class="badge badge-info">Students</span>{% else %}<span class="badge badge-navy">Teachers</span>{% endif %}
+          <div style="font-size:.75rem;color:var(--text-light);margin-top:8px;">{{ n.created_at[:10] }}</div>
+          <div style="font-size:.75rem;color:var(--text-light);">by {{ n.posted_by_name }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="card" style="padding:48px;text-align:center;">
+    <div style="font-size:3rem;opacity:.3;">📢</div>
+    <p style="color:var(--text-light);margin-top:12px;">No notices yet.</p>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="modal-overlay" id="addNoticeModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">📢 Post Notice</span><div class="modal-close">✕</div></div>
+    <form method="POST" action="{{ url_for('teacher_create_notice') }}" enctype="multipart/form-data">
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Title</label><input type="text" name="title" class="form-control" required></div>
+        <div class="form-group"><label class="form-label">Content</label><textarea name="content" class="form-control" rows="5" required></textarea></div>
+        <div class="form-group"><label class="form-label">Audience</label><select name="audience" class="form-control"><option value="students">Students</option><option value="all">Everyone</option></select></div>
+        <div class="form-group">
+          <label class="form-label">Attachment (PDF, DOCX, Image — optional)</label>
+          <div class="file-input-wrap">
+            <input type="file" name="attachment" accept=".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg">
+            <div class="file-icon">📎</div>
+            <div class="file-label">Attach a file (optional)</div>
+            <div class="file-hint">PDF, DOCX, PPT, or Image files accepted</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('addNoticeModal')">Cancel</button><button type="submit" class="btn btn-primary">Post Notice</button></div>
+    </form>
+  </div>
+</div>
+{% endblock %}

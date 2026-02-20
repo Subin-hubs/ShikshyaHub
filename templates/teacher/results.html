@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Results — ShikshyaHub{% endblock %}
+{% block role_label %}Teacher Portal{% endblock %}
+{% block page_title %}Results Management{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('teacher_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Teaching</div>
+<a href="{{ url_for('teacher_subjects') }}"><span class="nav-icon">📚</span> My Subjects</a>
+<a href="{{ url_for('teacher_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('teacher_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Communication</div>
+<a href="{{ url_for('teacher_notices') }}"><span class="nav-icon">📢</span> Notices
+  {% if notif_by_type.get('notice') %}<span class="nav-badge">{{ notif_by_type['notice'] }}</span>{% endif %}
+</a>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Results Management</h1><p>Upload and manage student marks</p></div>
+  <button class="btn btn-primary" onclick="openModal('addResultModal')">+ Add Result</button>
+</div>
+<div class="card">
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Student</th><th>Subject</th><th>Semester</th><th>Internal</th><th>Assignment</th><th>Exam</th><th>Total</th><th>Grade</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for r in results %}
+        <tr>
+          <td style="font-weight:600;color:var(--navy);">{{ r.student_name }}</td>
+          <td>{{ r.subject_name }}</td>
+          <td>Sem {{ r.semester }}</td>
+          <td>{{ r.internal_marks }}</td>
+          <td>{{ r.assignment_marks }}</td>
+          <td>{{ r.exam_marks }}</td>
+          <td style="font-weight:700;">{{ r.total_marks }}</td>
+          <td><span class="badge badge-{{ 'success' if r.grade in ['A+','A'] else 'warning' if r.grade.startswith('B') else 'danger' if r.grade=='F' else 'navy' }}">{{ r.grade }}</span></td>
+          <td>{% if r.published %}<span class="badge badge-success">Published</span>{% else %}<span class="badge badge-warning">Draft</span>{% endif %}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" class="text-center" style="padding:30px;color:var(--text-light);">No results yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addResultModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">📊 Add Result</span><div class="modal-close">✕</div></div>
+    <form method="POST" action="{{ url_for('teacher_add_result') }}">
+      <div class="modal-body">
+        <div class="form-row form-row-2">
+          <div class="form-group"><label class="form-label">Student</label><select name="student_id" class="form-control" required><option value="">— Select —</option>{% for s in students %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select></div>
+          <div class="form-group"><label class="form-label">Subject</label><select name="subject_id" class="form-control" required><option value="">— Select —</option>{% for s in subjects %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select></div>
+        </div>
+        <div class="form-group"><label class="form-label">Semester</label><select name="semester" class="form-control">{% for i in range(1,9) %}<option value="{{ i }}">Semester {{ i }}</option>{% endfor %}</select></div>
+        <div style="font-size:.82rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;">Marks Breakdown (Total = 100)</div>
+        <div class="form-row form-row-3">
+          <div class="form-group"><label class="form-label">Internal (/20)</label><input type="number" name="internal_marks" class="form-control" min="0" max="20" value="0"></div>
+          <div class="form-group"><label class="form-label">Assignment (/20)</label><input type="number" name="assignment_marks" class="form-control" min="0" max="20" value="0"></div>
+          <div class="form-group"><label class="form-label">Exam (/60)</label><input type="number" name="exam_marks" class="form-control" min="0" max="60" value="0"></div>
+        </div>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('addResultModal')">Cancel</button><button type="submit" class="btn btn-primary">Add Result</button></div>
+    </form>
+  </div>
+</div>
+{% endblock %}

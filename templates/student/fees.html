@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% block title %}Fees & Payments — ShikshyaHub{% endblock %}
+{% block role_label %}Student Portal{% endblock %}
+{% block page_title %}Fees & Payments{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('student_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Learning</div>
+<a href="{{ url_for('student_subjects') }}"><span class="nav-icon">📚</span> My Subjects</a>
+<a href="{{ url_for('student_tasks') }}"><span class="nav-icon">📝</span> Tasks
+  {% if notif_by_type.get('assignment') %}<span class="nav-badge">{{ notif_by_type['assignment'] }}</span>{% endif %}
+</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('student_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('student_results') }}"><span class="nav-icon">📊</span> Results
+  {% if notif_by_type.get('result') %}<span class="nav-badge">{{ notif_by_type['result'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('student_notices') }}"><span class="nav-icon">📢</span> Notices
+  {% if notif_by_type.get('notice') %}<span class="nav-badge">{{ notif_by_type['notice'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_fees') }}"><span class="nav-icon">💰</span> Fees
+  {% if notif_by_type.get('fee') %}<span class="nav-badge">{{ notif_by_type['fee'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_profile') }}"><span class="nav-icon">👤</span> Profile</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Fees & Payments</h1>
+    <p>Manage your semester fees and payment history</p>
+  </div>
+</div>
+
+{% if fees %}
+{% set total_all = fees|sum(attribute='total_fee') %}
+{% set paid_all  = fees|sum(attribute='paid_amount') %}
+{% set due_all   = total_all - paid_all %}
+
+<!-- Summary stats -->
+<div class="grid-3 mb-4">
+  <div class="stat-card">
+    <div class="icon stat-icon-navy" style="font-size:1.3rem;">💰</div>
+    <div>
+      <div class="stat-val" style="font-size:1.4rem;">Rs. {{ '{:,.0f}'.format(total_all) }}</div>
+      <div class="stat-label">Total Fees</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="icon stat-icon-green" style="font-size:1.3rem;">✅</div>
+    <div>
+      <div class="stat-val" style="font-size:1.4rem;color:var(--success);">Rs. {{ '{:,.0f}'.format(paid_all) }}</div>
+      <div class="stat-label">Amount Paid</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="icon" style="background:var(--danger-light);font-size:1.3rem;">⏳</div>
+    <div>
+      <div class="stat-val" style="font-size:1.4rem;color:{{ 'var(--danger)' if due_all > 0 else 'var(--success)' }};">Rs. {{ '{:,.0f}'.format(due_all) }}</div>
+      <div class="stat-label">Outstanding</div>
+    </div>
+  </div>
+</div>
+
+<!-- Overall progress -->
+{% set overall_pct = ((paid_all / total_all) * 100)|round(1) if total_all else 0 %}
+<div class="card mb-4">
+  <div class="card-body">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <span style="font-weight:700;font-size:.9rem;color:var(--navy);">Overall Payment Progress</span>
+      <span style="font-weight:800;font-size:1.1rem;color:var(--gold);">{{ overall_pct }}%</span>
+    </div>
+    <div class="progress" style="height:10px;">
+      <div class="progress-bar progress-bar-{{ 'success' if overall_pct >= 100 else 'gold' if overall_pct >= 50 else 'danger' }}"
+           style="width:{{ overall_pct }}%;"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--text-light);margin-top:6px;">
+      <span>Rs. 0</span>
+      <span>Rs. {{ '{:,.0f}'.format(total_all) }}</span>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Fee details per semester -->
+<div class="card mb-4">
+  <div class="card-header">
+    <span class="card-title">📋 Semester Fee Details</span>
+  </div>
+  {% for f in fees %}
+  {% set due = f.total_fee - f.paid_amount %}
+  {% set pct = ((f.paid_amount / f.total_fee) * 100)|round(1) if f.total_fee else 0 %}
+  <div style="padding:20px 24px;border-bottom:1px solid var(--border);">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+      <div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;color:var(--navy);">
+          Semester {{ f.semester }} Fees
+        </div>
+        <div style="display:flex;gap:12px;margin-top:4px;font-size:.82rem;color:var(--text-light);">
+          <span>Total: <strong style="color:var(--text-primary);">Rs. {{ '{:,.0f}'.format(f.total_fee) }}</strong></span>
+          <span>Paid: <strong style="color:var(--success);">Rs. {{ '{:,.0f}'.format(f.paid_amount) }}</strong></span>
+          <span>Due: <strong style="color:{{ 'var(--danger)' if due > 0 else 'var(--success)' }};">Rs. {{ '{:,.0f}'.format(due) }}</strong></span>
+        </div>
+        {% if f.due_date %}
+        <div style="font-size:.75rem;color:var(--text-light);margin-top:4px;">📅 Due date: {{ f.due_date }}</div>
+        {% endif %}
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        {% if f.status=='paid' %}
+          <span class="badge badge-success" style="font-size:.8rem;padding:5px 14px;">✓ Fully Paid</span>
+        {% elif f.status=='partial' %}
+          <span class="badge badge-warning" style="font-size:.8rem;padding:5px 14px;">⚡ Partial</span>
+        {% elif f.status=='overdue' %}
+          <span class="badge badge-danger" style="font-size:.8rem;padding:5px 14px;">⚠ Overdue</span>
+        {% else %}
+          <span class="badge badge-info" style="font-size:.8rem;padding:5px 14px;">💳 Pending</span>
+        {% endif %}
+        {% if due > 0 %}
+        <a href="{{ url_for('esewa_init', fid=f.id) }}" class="btn-esewa">
+          <svg width="18" height="18" viewBox="0 0 40 40" fill="none" style="flex-shrink:0;">
+            <circle cx="20" cy="20" r="20" fill="#fff"/>
+            <text x="20" y="26" text-anchor="middle" font-size="16" font-weight="800" fill="#60BB46">e</text>
+          </svg>
+          Pay Rs. {{ '{:,.0f}'.format(due) }} via eSewa
+        </a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="progress" style="height:6px;">
+      <div class="progress-bar progress-bar-{{ 'success' if pct >= 100 else 'gold' if pct > 0 else 'danger' }}"
+           style="width:{{ pct }}%;"></div>
+    </div>
+    <div style="font-size:.72rem;color:var(--text-light);margin-top:4px;">{{ pct }}% paid</div>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">💰</div>
+    No fee records found. Contact admin.
+  </div>
+  {% endfor %}
+</div>
+
+<!-- eSewa Info Block -->
+<div class="esewa-block mb-4">
+  <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+    <div style="font-size:2.5rem;">📱</div>
+    <div style="flex:1;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+        <div class="esewa-logo">e<span>Sewa</span></div>
+        <span class="badge badge-success">Secure Payment</span>
+        <span class="badge badge-gold">Nepal's #1 Wallet</span>
+      </div>
+      <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.65;margin-bottom:12px;">
+        Pay your semester fees instantly using eSewa digital wallet. Your payment is processed securely and your fee record is automatically updated. Receipts are generated immediately after successful payment.
+      </p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <span style="font-size:.75rem;background:rgba(96,187,70,.1);color:#276749;padding:4px 10px;border-radius:6px;font-weight:600;">✓ Instant confirmation</span>
+        <span style="font-size:.75rem;background:rgba(96,187,70,.1);color:#276749;padding:4px 10px;border-radius:6px;font-weight:600;">✓ Auto receipt generation</span>
+        <span style="font-size:.75rem;background:rgba(96,187,70,.1);color:#276749;padding:4px 10px;border-radius:6px;font-weight:600;">✓ 256-bit SSL encrypted</span>
+        <span style="font-size:.75rem;background:rgba(96,187,70,.1);color:#276749;padding:4px 10px;border-radius:6px;font-weight:600;">✓ Transaction record saved</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Payment History -->
+{% if payments %}
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">🧾 Payment History</span>
+    <span class="badge badge-navy">{{ payments|length }} transactions</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Receipt / Transaction</th>
+          <th>Amount</th>
+          <th>Semester</th>
+          <th>Method</th>
+          <th>Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in payments %}
+        <tr>
+          <td>
+            <div style="font-weight:700;font-size:.8rem;color:var(--navy);">{{ p.receipt_no or 'N/A' }}</div>
+            {% if p.transaction_id %}
+            <div style="font-size:.72rem;color:var(--text-light);">Ref: {{ p.transaction_id }}</div>
+            {% endif %}
+          </td>
+          <td style="font-weight:800;color:var(--success);font-size:.95rem;">Rs. {{ '{:,.0f}'.format(p.amount) }}</td>
+          <td>Semester {{ p.semester }}</td>
+          <td>
+            {% if p.method == 'esewa' %}
+            <span class="esewa-logo" style="font-size:.8rem;">e<span>Sewa</span></span>
+            {% else %}
+            <span class="badge badge-navy">{{ (p.method or 'cash').title() }}</span>
+            {% endif %}
+          </td>
+          <td style="font-size:.82rem;color:var(--text-light);">{{ p.payment_date }}</td>
+          <td><span class="badge badge-success">✓ Confirmed</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block title %}Student Dashboard — ShikshyaHub{% endblock %}
+{% block role_label %}Student Portal{% endblock %}
+{% block page_title %}My Dashboard{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('student_dashboard') }}" class="active"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Learning</div>
+<a href="{{ url_for('student_subjects') }}"><span class="nav-icon">📚</span> My Subjects</a>
+<a href="{{ url_for('student_tasks') }}"><span class="nav-icon">📝</span> Tasks
+  {% if notif_by_type.get('assignment') %}<span class="nav-badge">{{ notif_by_type['assignment'] }}</span>{% endif %}
+</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('student_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('student_results') }}"><span class="nav-icon">📊</span> Results
+  {% if notif_by_type.get('result') %}<span class="nav-badge">{{ notif_by_type['result'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('student_notices') }}"><span class="nav-icon">📢</span> Notices
+  {% if notif_by_type.get('notice') %}<span class="nav-badge">{{ notif_by_type['notice'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_fees') }}"><span class="nav-icon">💰</span> Fees
+  {% if notif_by_type.get('fee') %}<span class="nav-badge">{{ notif_by_type['fee'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_profile') }}"><span class="nav-icon">👤</span> Profile</a>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Welcome, {{ session.name.split()[0] }} 🎓</h1>
+    <p>{% if class_info %}{{ class_info.name }}{% else %}No class assigned{% endif %} · Here's your academic overview.</p>
+  </div>
+</div>
+
+<div class="grid-4 mb-4">
+  <div class="stat-card">
+    <div class="icon" style="background:var(--gold-pale);font-size:1.4rem;">📊</div>
+    <div>
+      <div class="stat-val">{{ att_pct }}%</div>
+      <div class="stat-label">Attendance</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="icon stat-icon-navy">📚</div>
+    <div>
+      <div class="stat-val" data-count="{{ subjects|length }}">0</div>
+      <div class="stat-label">Subjects</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="icon" style="background:var(--warning-light);">📝</div>
+    <div>
+      <div class="stat-val" data-count="{{ pending }}">0</div>
+      <div class="stat-label">Pending Tasks</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="icon stat-icon-green">✅</div>
+    <div>
+      <div class="stat-val">Good</div>
+      <div class="stat-label">Standing</div>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2 mb-4">
+  <!-- Today's Classes -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">📅 Today's Schedule</span><a href="{{ url_for('student_timetable') }}" class="btn btn-sm btn-outline">Full Timetable</a></div>
+    <div class="card-body" style="padding:0;">
+      {% for c in today_schedule %}
+      <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;">
+        <div style="background:var(--gold-pale);border-radius:8px;padding:8px 12px;text-align:center;min-width:72px;flex-shrink:0;">
+          <div style="font-size:.7rem;font-weight:700;color:var(--gold);text-transform:uppercase;">Start</div>
+          <div style="font-size:.9rem;font-weight:700;color:var(--navy);">{{ c.start_time }}</div>
+        </div>
+        <div>
+          <div style="font-weight:600;color:var(--navy);">{{ c.subject_name }}</div>
+          <div style="font-size:.78rem;color:var(--text-light);">{{ c.teacher_name or 'TBA' }} · {{ c.room or 'TBD' }}</div>
+        </div>
+      </div>
+      {% else %}
+      <div class="empty-state"><div class="empty-icon">📅</div>No classes today. Enjoy your break!</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Attendance Summary -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">📊 Attendance Overview</span><a href="{{ url_for('student_attendance') }}" class="btn btn-sm btn-outline">Details</a></div>
+    <div class="card-body" style="display:flex;align-items:center;gap:24px;">
+      <canvas id="attChart" data-pct="{{ att_pct }}" width="110" height="110" style="flex-shrink:0;"></canvas>
+      <div style="flex:1;">
+        <div style="margin-bottom:12px;">
+          <div style="font-size:.85rem;font-weight:600;color:var(--navy);margin-bottom:5px;">Overall: {{ att_pct }}%</div>
+          <div class="progress"><div class="progress-bar progress-bar-{{ 'success' if att_pct >= 75 else 'danger' }}" style="width:{{ att_pct }}%;"></div></div>
+        </div>
+        <div style="font-size:.8rem;color:var(--text-light);">
+          {% if att_pct >= 75 %}<span style="color:var(--success);">✓ Good standing</span>{% else %}<span style="color:var(--danger);">⚠ Below 75% minimum</span>{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- Fee Status -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">💰 Fee Status</span><a href="{{ url_for('student_fees') }}" class="btn btn-sm btn-outline">View Details</a></div>
+    <div class="card-body">
+      {% if fee_info %}
+      {% set pct = ((fee_info.paid_amount / fee_info.total_fee) * 100)|round(1) %}
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:.9rem;">
+        <div><span style="color:var(--text-light);">Total:</span> <strong>Rs. {{ '{:,.0f}'.format(fee_info.total_fee) }}</strong></div>
+        <div><span style="color:var(--text-light);">Paid:</span> <strong style="color:var(--success);">Rs. {{ '{:,.0f}'.format(fee_info.paid_amount) }}</strong></div>
+      </div>
+      <div class="progress" style="margin-bottom:8px;"><div class="progress-bar progress-bar-{{ 'success' if fee_info.status=='paid' else 'gold' if fee_info.status=='partial' else 'danger' }}" style="width:{{ pct }}%;"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:.8rem;">
+        <span class="badge badge-{{ 'success' if fee_info.status=='paid' else 'warning' if fee_info.status=='partial' else 'danger' }}">{{ fee_info.status.title() }}</span>
+        <span style="color:var(--text-light);">Due: {{ fee_info.due_date or 'N/A' }}</span>
+      </div>
+      {% else %}
+      <div class="empty-state"><div class="empty-icon">💰</div>No fee records found.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Recent Notices -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">📢 Recent Notices</span><a href="{{ url_for('student_notices') }}" class="btn btn-sm btn-outline">View All</a></div>
+    <div class="card-body" style="padding:0;">
+      {% for n in notices %}
+      <div style="padding:13px 20px;border-bottom:1px solid var(--border);">
+        <div style="font-weight:600;font-size:.875rem;color:var(--navy);">{{ n.title }}</div>
+        <div style="font-size:.78rem;color:var(--text-light);margin-top:4px;">{{ n.content[:60] }}{% if n.content|length > 60 %}...{% endif %}</div>
+        <div style="font-size:.72rem;color:var(--text-light);margin-top:4px;">{{ n.created_at[:10] }}</div>
+      </div>
+      {% else %}
+      <div class="empty-state"><div class="empty-icon">📢</div>No notices.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

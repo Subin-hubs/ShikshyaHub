@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}My Subjects — ShikshyaHub{% endblock %}
+{% block role_label %}Teacher Portal{% endblock %}
+{% block page_title %}My Subjects{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('teacher_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Teaching</div>
+<a href="{{ url_for('teacher_subjects') }}"><span class="nav-icon">📚</span> My Subjects</a>
+<a href="{{ url_for('teacher_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('teacher_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Communication</div>
+<a href="{{ url_for('teacher_notices') }}"><span class="nav-icon">📢</span> Notices
+  {% if notif_by_type.get('notice') %}<span class="nav-badge">{{ notif_by_type['notice'] }}</span>{% endif %}
+</a>
+{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>My Subjects</h1><p>{{ subjects|length }} subjects assigned to you</p></div></div>
+<div class="grid-3">
+  {% for s in subjects %}
+  <div class="card" style="transition:transform .2s,box-shadow .2s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+    <div style="height:6px;background:linear-gradient(90deg,var(--navy),var(--gold));"></div>
+    <div class="card-body">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+        <div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:var(--navy);margin-bottom:4px;">{{ s.name }}</div>
+          <span class="badge badge-gold">{{ s.code }}</span>
+        </div>
+        <div style="font-size:2rem;">📚</div>
+      </div>
+      <div style="font-size:.82rem;color:var(--text-light);margin-bottom:4px;">{{ s.class_name or 'No class' }}</div>
+      <div style="font-size:.82rem;color:var(--text-light);margin-bottom:16px;">{{ s.student_count }} students · {{ s.credits }} credits</div>
+      <a href="{{ url_for('teacher_subject_detail', sid=s.id) }}" class="btn btn-primary" style="width:100%;justify-content:center;">Open Subject →</a>
+    </div>
+  </div>
+  {% else %}
+  <div class="card" style="padding:48px;text-align:center;grid-column:1/-1;">
+    <div style="font-size:3rem;opacity:.3;">📚</div>
+    <p style="color:var(--text-light);margin-top:12px;">No subjects assigned yet. Contact admin.</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

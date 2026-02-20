@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Attendance — ShikshyaHub{% endblock %}
+{% block role_label %}Admin Panel{% endblock %}
+{% block page_title %}Attendance Control{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('admin_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Management</div>
+<a href="{{ url_for('admin_students') }}"><span class="nav-icon">🎓</span> Students</a>
+<a href="{{ url_for('admin_teachers') }}"><span class="nav-icon">👨‍🏫</span> Teachers</a>
+<a href="{{ url_for('admin_subjects') }}"><span class="nav-icon">📚</span> Subjects</a>
+<a href="{{ url_for('admin_classes') }}"><span class="nav-icon">🏛</span> Classes & Programs</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('admin_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<a href="{{ url_for('admin_attendance') }}" class="active"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('admin_assignments') }}"><span class="nav-icon">📝</span> Assignments</a>
+<a href="{{ url_for('admin_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('admin_notices') }}"><span class="nav-icon">📢</span> Notices</a>
+<a href="{{ url_for('admin_fees') }}"><span class="nav-icon">💰</span> Fees</a>
+{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Attendance Control</h1><p>View and manage all attendance records</p></div></div>
+<div class="grid-3 mb-4">
+  <div class="stat-card"><div class="icon stat-icon-blue">📋</div><div><div class="stat-val" data-count="{{ total }}">0</div><div class="stat-label">Total Records</div></div></div>
+  <div class="stat-card"><div class="icon stat-icon-green">✅</div><div><div class="stat-val" data-count="{{ present }}">0</div><div class="stat-label">Present</div></div></div>
+  <div class="stat-card"><div class="icon" style="background:var(--danger-light);">❌</div><div><div class="stat-val" data-count="{{ absent }}">0</div><div class="stat-label">Absent</div></div></div>
+</div>
+<div class="card">
+  <div class="card-header"><span class="card-title">✅ Attendance Records (Recent 100)</span></div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Student</th><th>Subject</th><th>Date</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for a in attendance %}
+        <tr>
+          <td style="font-weight:600;">{{ a.student_name }}</td>
+          <td>{{ a.subject_name }}</td>
+          <td style="font-size:.82rem;color:var(--text-light);">{{ a.date }}</td>
+          <td>
+            {% if a.status == 'present' %}<span class="badge badge-success">✓ Present</span>
+            {% elif a.status == 'absent' %}<span class="badge badge-danger">✗ Absent</span>
+            {% else %}<span class="badge badge-warning">⚠ Late</span>{% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center" style="padding:40px;color:var(--text-light);">No records found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

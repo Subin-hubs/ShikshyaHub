@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Timetable — ShikshyaHub{% endblock %}
+{% block role_label %}Student Portal{% endblock %}
+{% block page_title %}My Timetable{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('student_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Learning</div>
+<a href="{{ url_for('student_subjects') }}"><span class="nav-icon">📚</span> My Subjects</a>
+<a href="{{ url_for('student_tasks') }}"><span class="nav-icon">📝</span> Tasks
+  {% if notif_by_type.get('assignment') %}<span class="nav-badge">{{ notif_by_type['assignment'] }}</span>{% endif %}
+</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('student_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('student_results') }}"><span class="nav-icon">📊</span> Results
+  {% if notif_by_type.get('result') %}<span class="nav-badge">{{ notif_by_type['result'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('student_notices') }}"><span class="nav-icon">📢</span> Notices
+  {% if notif_by_type.get('notice') %}<span class="nav-badge">{{ notif_by_type['notice'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_fees') }}"><span class="nav-icon">💰</span> Fees
+  {% if notif_by_type.get('fee') %}<span class="nav-badge">{{ notif_by_type['fee'] }}</span>{% endif %}
+</a>
+<a href="{{ url_for('student_profile') }}"><span class="nav-icon">👤</span> Profile</a>
+{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>My Timetable</h1><p>{% if class_info %}{{ class_info.name }} · {% endif %}Weekly class schedule</p></div></div>
+{% set days = ['Monday','Tuesday','Wednesday','Thursday','Friday'] %}
+{% for day in days %}
+{% set day_classes = timetable|selectattr('day','equalto',day)|list %}
+{% if day_classes %}
+<div class="card mb-3">
+  <div class="card-header">
+    <span class="card-title">{{ day }}</span>
+    <span class="badge badge-navy">{{ day_classes|length }} class{{ 'es' if day_classes|length != 1 }}</span>
+  </div>
+  <div class="card-body" style="padding:0;">
+    {% for t in day_classes %}
+    <div style="padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;{% if loop.last %}border-bottom:none;{% endif %}">
+      <div style="background:var(--navy);color:#fff;border-radius:8px;padding:10px 14px;text-align:center;min-width:80px;flex-shrink:0;">
+        <div style="font-size:.7rem;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;">Time</div>
+        <div style="font-size:.85rem;font-weight:700;">{{ t.start_time }}</div>
+        <div style="font-size:.7rem;color:rgba(255,255,255,.6);">{{ t.end_time }}</div>
+      </div>
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:1rem;color:var(--navy);">{{ t.subject_name }}</div>
+        <div style="font-size:.82rem;color:var(--text-light);margin-top:4px;">👨‍🏫 {{ t.teacher_name or 'TBA' }}</div>
+      </div>
+      <span class="badge badge-gold">{{ t.room or 'TBD' }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endfor %}
+{% if not timetable %}
+<div class="card" style="padding:48px;text-align:center;">
+  <div style="font-size:3rem;opacity:.3;">📅</div>
+  <p style="color:var(--text-light);margin-top:12px;">No timetable configured yet. Contact admin.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}Notices — ShikshyaHub{% endblock %}
+{% block role_label %}Admin Panel{% endblock %}
+{% block page_title %}Notice Board{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('admin_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Management</div>
+<a href="{{ url_for('admin_students') }}"><span class="nav-icon">🎓</span> Students</a>
+<a href="{{ url_for('admin_teachers') }}"><span class="nav-icon">👨‍🏫</span> Teachers</a>
+<a href="{{ url_for('admin_subjects') }}"><span class="nav-icon">📚</span> Subjects</a>
+<a href="{{ url_for('admin_classes') }}"><span class="nav-icon">🏛</span> Classes</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('admin_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<a href="{{ url_for('admin_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('admin_assignments') }}"><span class="nav-icon">📝</span> Assignments</a>
+<a href="{{ url_for('admin_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('admin_notices') }}" class="active"><span class="nav-icon">📢</span> Notices</a>
+<a href="{{ url_for('admin_fees') }}"><span class="nav-icon">💰</span> Fees</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Notice Board</h1>
+    <p>{{ notices|length }} notices posted</p>
+  </div>
+  <button class="btn btn-primary" onclick="openModal('addNoticeModal')">📢 Post Notice</button>
+</div>
+
+<!-- Notices list -->
+<div style="display:flex;flex-direction:column;gap:14px;">
+  {% for n in notices %}
+  <div class="card">
+    <div class="card-body">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div style="display:flex;gap:14px;flex:1;min-width:0;">
+          <div style="width:44px;height:44px;border-radius:10px;background:var(--gold-pale);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">📢</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:var(--navy);margin-bottom:5px;">{{ n.title }}</div>
+            <p style="font-size:.875rem;color:var(--text-secondary);line-height:1.65;margin-bottom:10px;">{{ n.content }}</p>
+            {% if n.attachment %}
+            <a href="{{ url_for('serve_upload', folder='notices', filename=n.attachment) }}"
+               class="btn btn-sm btn-outline" download style="margin-bottom:8px;">
+              📎 {{ n.attachment_name or 'Attachment' }}
+            </a>
+            {% endif %}
+            <div style="font-size:.75rem;color:var(--text-light);">
+              By <strong>{{ n.posted_by_name or 'Admin' }}</strong> · {{ n.created_at[:10] }}
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;">
+          {% if n.audience=='all' %}<span class="badge badge-gold">All Users</span>
+          {% elif n.audience=='students' %}<span class="badge badge-info">Students</span>
+          {% elif n.audience=='teachers' %}<span class="badge badge-navy">Teachers</span>
+          {% else %}<span class="badge badge-warning">Admin</span>{% endif %}
+          <form method="POST" action="{{ url_for('admin_delete_notice', nid=n.id) }}">
+            <button type="submit" class="btn btn-xs btn-danger" data-confirm="Delete this notice?">🗑 Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="card" style="padding:48px;text-align:center;">
+    <div style="font-size:3rem;opacity:.3;">📢</div>
+    <p style="color:var(--text-light);margin-top:12px;">No notices posted yet. Create the first one.</p>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Post Notice Modal -->
+<div class="modal-overlay" id="addNoticeModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">📢 Post New Notice</span>
+      <div class="modal-close">✕</div>
+    </div>
+    <form method="POST" action="{{ url_for('admin_create_notice') }}" enctype="multipart/form-data">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Notice Title</label>
+          <input type="text" name="title" class="form-control" required placeholder="e.g., Exam Schedule Update">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Content</label>
+          <textarea name="content" class="form-control" rows="5" required
+                    placeholder="Write your notice content here..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Audience</label>
+          <select name="audience" class="form-control">
+            <option value="all">All Users (Students + Teachers + Admin)</option>
+            <option value="students">Students Only</option>
+            <option value="teachers">Teachers Only</option>
+            <option value="admin">Admin Only</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Attachment (PDF, DOCX, Image — optional)</label>
+          <div class="file-input-wrap">
+            <input type="file" name="attachment"
+                   accept=".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg">
+            <div class="file-icon">📎</div>
+            <div class="file-label">Attach a file to this notice</div>
+            <div class="file-hint">PDF, DOCX, PPT, or Image files accepted</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('addNoticeModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">📢 Publish Notice</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

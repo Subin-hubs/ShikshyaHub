@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Submissions — ShikshyaHub{% endblock %}
+{% block role_label %}Teacher Portal{% endblock %}
+{% block page_title %}Submissions{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('teacher_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Teaching</div>
+<a href="{{ url_for('teacher_subjects') }}"><span class="nav-icon">📚</span> My Subjects</a>
+<a href="{{ url_for('teacher_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('teacher_results') }}"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Communication</div>
+<a href="{{ url_for('teacher_notices') }}"><span class="nav-icon">📢</span> Notices
+  {% if notif_by_type.get('notice') %}<span class="nav-badge">{{ notif_by_type['notice'] }}</span>{% endif %}
+</a>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ assignment.title }}</h1>
+    <p>{{ assignment.subject_name }} · Due: {{ assignment.due_date or 'No deadline' }} · Max Marks: {{ assignment.max_marks }}</p>
+  </div>
+  <a href="{{ url_for('teacher_subject_detail', sid=assignment.subject_id) }}" class="btn btn-outline">← Back to Subject</a>
+</div>
+<div class="card">
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Student</th><th>Submitted At</th><th>Notes</th><th>Marks</th><th>Feedback</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for sub in submissions %}
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy-light));display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:700;">{{ sub.student_name[0].upper() }}</div>
+              <span style="font-weight:600;color:var(--navy);">{{ sub.student_name }}</span>
+            </div>
+          </td>
+          <td style="font-size:.82rem;color:var(--text-light);">{{ sub.submitted_at[:16] if sub.submitted_at else '—' }}</td>
+          <td style="font-size:.82rem;color:var(--text-secondary);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ sub.notes or '—' }}</td>
+          <td>{% if sub.marks is not none %}<span class="badge badge-success">{{ sub.marks }}/{{ assignment.max_marks }}</span>{% else %}<span class="badge badge-warning">Ungraded</span>{% endif %}</td>
+          <td style="font-size:.82rem;color:var(--text-secondary);">{{ sub.feedback or '—' }}</td>
+          <td><button class="btn btn-sm btn-gold" onclick="openGradeModal({{ sub.id }}, '{{ sub.student_name }}', {{ sub.marks or '' }}, `{{ sub.feedback or '' }}`)">✏️ Grade</button></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center" style="padding:40px;color:var(--text-light);">No submissions yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-overlay" id="gradeModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="gradeModalTitle">✏️ Grade Submission</span><div class="modal-close" onclick="closeModal('gradeModal')">✕</div></div>
+    <form method="POST" id="gradeForm">
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Marks (out of {{ assignment.max_marks }})</label><input type="number" name="marks" id="gradeMarks" class="form-control" required min="0" max="{{ assignment.max_marks }}"></div>
+        <div class="form-group"><label class="form-label">Feedback</label><textarea name="feedback" id="gradeFeedback" class="form-control" rows="3" placeholder="Provide feedback..."></textarea></div>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('gradeModal')">Cancel</button><button type="submit" class="btn btn-gold">Save Grade</button></div>
+    </form>
+  </div>
+</div>
+{% block extra_js %}
+<script>
+function openGradeModal(subId, studentName, marks, feedback) {
+  document.getElementById('gradeModalTitle').textContent = '✏️ Grade — ' + studentName;
+  document.getElementById('gradeForm').action = '/teacher/submissions/grade/' + subId;
+  document.getElementById('gradeMarks').value = marks || '';
+  document.getElementById('gradeFeedback').value = feedback || '';
+  openModal('gradeModal');
+}
+</script>
+{% endblock %}
+{% endblock %}

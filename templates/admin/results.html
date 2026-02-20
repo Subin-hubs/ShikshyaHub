@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Results — ShikshyaHub{% endblock %}
+{% block role_label %}Admin Panel{% endblock %}
+{% block page_title %}Results Management{% endblock %}
+{% block sidebar_nav %}
+<div class="sidebar-section-label">Overview</div>
+<a href="{{ url_for('admin_dashboard') }}"><span class="nav-icon">🏠</span> Dashboard</a>
+<div class="sidebar-section-label">Management</div>
+<a href="{{ url_for('admin_students') }}"><span class="nav-icon">🎓</span> Students</a>
+<a href="{{ url_for('admin_teachers') }}"><span class="nav-icon">👨‍🏫</span> Teachers</a>
+<a href="{{ url_for('admin_subjects') }}"><span class="nav-icon">📚</span> Subjects</a>
+<a href="{{ url_for('admin_classes') }}"><span class="nav-icon">🏛</span> Classes & Programs</a>
+<div class="sidebar-section-label">Academic</div>
+<a href="{{ url_for('admin_timetable') }}"><span class="nav-icon">📅</span> Timetable</a>
+<a href="{{ url_for('admin_attendance') }}"><span class="nav-icon">✅</span> Attendance</a>
+<a href="{{ url_for('admin_assignments') }}"><span class="nav-icon">📝</span> Assignments</a>
+<a href="{{ url_for('admin_results') }}" class="active"><span class="nav-icon">📊</span> Results</a>
+<div class="sidebar-section-label">Administration</div>
+<a href="{{ url_for('admin_notices') }}"><span class="nav-icon">📢</span> Notices</a>
+<a href="{{ url_for('admin_fees') }}"><span class="nav-icon">💰</span> Fees</a>
+{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Results Management</h1><p>Review and publish student results</p></div></div>
+<div class="card">
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Student</th><th>Subject</th><th>Semester</th><th>Internal</th><th>Assignment</th><th>Exam</th><th>Total</th><th>Grade</th><th>GPA</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for r in results %}
+        <tr>
+          <td style="font-weight:600;color:var(--navy);">{{ r.student_name }}</td>
+          <td style="font-size:.85rem;">{{ r.subject_name }}</td>
+          <td>Sem {{ r.semester }}</td>
+          <td>{{ r.internal_marks }}/20</td>
+          <td>{{ r.assignment_marks }}/20</td>
+          <td>{{ r.exam_marks }}/60</td>
+          <td style="font-weight:700;color:var(--navy);">{{ r.total_marks }}</td>
+          <td><span class="badge badge-{{ 'success' if r.grade in ['A+','A'] else 'warning' if r.grade in ['B+','B'] else 'danger' if r.grade=='F' else 'navy' }}">{{ r.grade }}</span></td>
+          <td style="font-weight:700;color:var(--gold);">{{ r.gpa }}</td>
+          <td>{% if r.published %}<span class="badge badge-success">Published</span>{% else %}<span class="badge badge-warning">Draft</span>{% endif %}</td>
+          <td>
+            {% if not r.published %}
+            <form method="POST" action="{{ url_for('admin_publish_result', rid=r.id) }}" style="display:inline;">
+              <button type="submit" class="btn btn-sm btn-success">Publish</button>
+            </form>
+            {% else %}
+            <span style="color:var(--text-light);font-size:.8rem;">Published</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="11" class="text-center" style="padding:40px;color:var(--text-light);">No results submitted yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
