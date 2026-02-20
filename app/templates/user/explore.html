@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Explore Recipes - FlavorHive{% endblock %}
+
+{% block content %}
+{% include 'includes/user_sidebar.html' %}
+
+<div class="main-content">
+    <div class="mb-4">
+        <h1 class="text-primary" style="font-weight: 700;"><i class="fas fa-compass"></i> Explore Recipes</h1>
+        <p class="text-muted">Discover amazing recipes from our community</p>
+    </div>
+
+    {% if recipes %}
+        <div class="row g-4">
+            {% for recipe in recipes %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        {% if recipe.image %}
+                            <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" 
+                                 class="card-img-top" alt="{{ recipe.title }}">
+                        {% else %}
+                            <img src="https://via.placeholder.com/400x200?text={{ recipe.title }}" 
+                                 class="card-img-top" alt="{{ recipe.title }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ recipe.title }}</h5>
+                            <p class="card-text text-muted small">
+                                <i class="fas fa-user me-1"></i> {{ recipe.author.full_name }}
+                                {% if recipe.author.is_premium %}
+                                    <span class="badge bg-warning text-dark ms-1">Premium</span>
+                                {% endif %}
+                            </p>
+                            <p class="card-text text-muted small mb-2">
+                                <i class="fas fa-tag me-1"></i> {{ recipe.category|capitalize }}
+                                <i class="fas fa-clock ms-2 me-1"></i> {{ recipe.cooking_time or 'N/A' }} min
+                            </p>
+                            <p class="card-text">{{ recipe.description[:100] }}...</p>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="badge bg-success">{{ recipe.difficulty|capitalize }}</span>
+                                <a href="{{ url_for('user.recipe_detail', recipe_id=recipe.id) }}" 
+                                   class="btn btn-sm btn-primary">
+                                    View Recipe <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No recipes found</h4>
+            <p class="text-muted">Be the first to share a recipe!</p>
+            <a href="{{ url_for('user.upload_recipe') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i> Upload Recipe
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

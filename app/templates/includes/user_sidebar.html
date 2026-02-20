@@ -1,0 +1,50 @@
+<div class="sidebar">
+    <div class="sidebar-brand">
+        <i class="fas fa-utensils"></i> FlavorHive
+    </div>
+    <ul class="sidebar-menu">
+        <li>
+            <a href="{{ url_for('user.dashboard') }}">
+                <i class="fas fa-home"></i> Home
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('user.upload_recipe') }}">
+                <i class="fas fa-cloud-upload-alt"></i> Upload Recipe
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('user.my_recipes') }}">
+                <i class="fas fa-book"></i> My Recipes
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('user.explore') }}">
+                <i class="fas fa-compass"></i> Explore Recipes
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('user.my_comments') }}">
+                <i class="fas fa-comments"></i> My Comments
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('payment.premium') }}">
+                <i class="fas fa-crown"></i> Premium
+                {% if current_user.is_premium %}
+                    <span class="badge bg-warning ms-2">Active</span>
+                {% endif %}
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('user.profile') }}">
+                <i class="fas fa-user-circle"></i> Profile
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </li>
+    </ul>
+</div>

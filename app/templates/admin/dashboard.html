@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - FlavorHive{% endblock %}
+
+{% block content %}
+{% include 'includes/admin_sidebar.html' %}
+
+<div class="main-content">
+    <div class="mb-4">
+        <h1 class="text-primary" style="font-weight: 700;">
+            <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+        </h1>
+        <p class="text-muted">Welcome back, {{ current_user.full_name }}! Here's your overview.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card primary">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value">{{ total_users }}</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card secondary">
+                <div class="stat-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="stat-value">{{ total_recipes }}</div>
+                <div class="stat-label">Total Recipes</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card accent">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-value">{{ pending_recipes }}</div>
+                <div class="stat-label">Pending Approval</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card primary">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-value">{{ approved_recipes }}</div>
+                <div class="stat-label">Approved Recipes</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card secondary">
+                <div class="stat-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="stat-value">{{ total_comments }}</div>
+                <div class="stat-label">Total Comments</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card accent">
+                <div class="stat-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="stat-value">{{ total_payments }}</div>
+                <div class="stat-label">Successful Payments</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card primary">
+                <div class="stat-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-value">{{ "%.0f"|format(total_revenue) }}</div>
+                <div class="stat-label">Total Revenue (NPR)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3"><i class="fas fa-bolt text-warning"></i> Quick Actions</h5>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="{{ url_for('admin.recipes', status='pending') }}" class="btn btn-warning">
+                            <i class="fas fa-clock me-2"></i> Review Pending Recipes ({{ pending_recipes }})
+                        </a>
+                        <a href="{{ url_for('admin.users') }}" class="btn btn-primary">
+                            <i class="fas fa-users me-2"></i> View All Users
+                        </a>
+                        <a href="{{ url_for('admin.comments') }}" class="btn btn-secondary">
+                            <i class="fas fa-comments me-2"></i> Manage Comments
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Recipes -->
+    <div class="card shadow-lg">
+        <div class="card-body p-4">
+            <h5 class="card-title mb-3"><i class="fas fa-clock me-2"></i> Recent Recipes</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for recipe in recent_recipes %}
+                            <tr>
+                                <td><strong>{{ recipe.title }}</strong></td>
+                                <td>{{ recipe.author.full_name }}</td>
+                                <td><span class="badge bg-info">{{ recipe.category|capitalize }}</span></td>
+                                <td>
+                                    {% if recipe.status == 'pending' %}
+                                        <span class="badge badge-pending">Pending</span>
+                                    {% elif recipe.status == 'approved' %}
+                                        <span class="badge badge-approved">Approved</span>
+                                    {% else %}
+                                        <span class="badge badge-rejected">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ recipe.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        {% if recipe.status == 'pending' %}
+                                            <form method="POST" action="{{ url_for('admin.approve_recipe', recipe_id=recipe.id) }}" class="d-inline">
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="{{ url_for('admin.reject_recipe', recipe_id=recipe.id) }}" class="d-inline">
+                                                <button type="submit" class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                        <form method="POST" action="{{ url_for('admin.delete_recipe', recipe_id=recipe.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

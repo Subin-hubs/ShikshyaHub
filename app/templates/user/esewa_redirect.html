@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Processing Payment - FlavorHive{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center" style="background: var(--background);">
+    <div class="text-center">
+        <div class="spinner-border text-primary mb-3" style="width: 4rem; height: 4rem;"></div>
+        <h3 class="text-primary">Redirecting to eSewa...</h3>
+        <p class="text-muted">Please wait while we redirect you to the payment gateway.</p>
+    </div>
+</div>
+
+<form id="esewaForm" action="{{ esewa_url }}" method="POST" style="display: none;">
+    <input type="hidden" name="amt" value="{{ params.amt }}">
+    <input type="hidden" name="psc" value="{{ params.psc }}">
+    <input type="hidden" name="pdc" value="{{ params.pdc }}">
+    <input type="hidden" name="txAmt" value="{{ params.txAmt }}">
+    <input type="hidden" name="tAmt" value="{{ params.tAmt }}">
+    <input type="hidden" name="pid" value="{{ params.pid }}">
+    <input type="hidden" name="scd" value="{{ params.scd }}">
+    <input type="hidden" name="su" value="{{ params.su }}">
+    <input type="hidden" name="fu" value="{{ params.fu }}">
+</form>
+
+<script>
+    document.getElementById('esewaForm').submit();
+</script>
+{% endblock %}

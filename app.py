@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """
 ShikshyaHub — Professional Student Portal System
 Flask Backend · SQLite Database · v2.0
@@ -1271,3 +1272,16 @@ def api_stats():
 if __name__ == '__main__':
     init_db()
     app.run(debug=True, host='0.0.0.0', port=5000)
+=======
+from app import create_app
+
+app = create_app()
+
+# For Vercel
+if __name__ != '__main__':
+    # Production mode for Vercel
+    app.config['DEBUG'] = False
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
+>>>>>>> 3c7f15ec2d0064ebedc890ff39720893f503f309

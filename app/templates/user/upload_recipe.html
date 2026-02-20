@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Recipe - FlavorHive{% endblock %}
+
+{% block content %}
+{% include 'includes/user_sidebar.html' %}
+
+<div class="main-content">
+    <div class="mb-4">
+        <h1 class="text-primary" style="font-weight: 700;"><i class="fas fa-cloud-upload-alt"></i> Upload New Recipe</h1>
+        <p class="text-muted">Share your culinary masterpiece with the FlavorHive community!</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Recipe Title *</label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   placeholder="Enter recipe title" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description *</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" 
+                                      placeholder="Brief description of your recipe" required></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="category" class="form-label">Category *</label>
+                                <select class="form-control" id="category" name="category" required>
+                                    <option value="">Select category</option>
+                                    <option value="breakfast">Breakfast</option>
+                                    <option value="lunch">Lunch</option>
+                                    <option value="dinner">Dinner</option>
+                                    <option value="dessert">Dessert</option>
+                                    <option value="snack">Snack</option>
+                                    <option value="beverage">Beverage</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="difficulty" class="form-label">Difficulty *</label>
+                                <select class="form-control" id="difficulty" name="difficulty" required>
+                                    <option value="">Select difficulty</option>
+                                    <option value="easy">Easy</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="hard">Hard</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="cooking_time" class="form-label">Cooking Time (min)</label>
+                                <input type="number" class="form-control" id="cooking_time" name="cooking_time" 
+                                       placeholder="30">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="servings" class="form-label">Servings</label>
+                            <input type="number" class="form-control" id="servings" name="servings" 
+                                   placeholder="4">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ingredients" class="form-label">Ingredients *</label>
+                            <textarea class="form-control" id="ingredients" name="ingredients" rows="6" 
+                                      placeholder="List all ingredients (one per line or separated by commas)" required></textarea>
+                            <small class="text-muted">Example: 2 cups flour, 1 tsp salt, 3 eggs</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="steps" class="form-label">Cooking Steps *</label>
+                            <textarea class="form-control" id="steps" name="steps" rows="8" 
+                                      placeholder="Describe the cooking steps in detail" required></textarea>
+                            <small class="text-muted">Be as detailed as possible to help others recreate your recipe</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="image" class="form-label">Recipe Image</label>
+                            <input type="file" class="form-control" id="image" name="image" 
+                                   accept="image/png, image/jpeg, image/jpg, image/gif, image/webp">
+                            <small class="text-muted">Upload an image of your dish (PNG, JPG, GIF, WEBP - Max 16MB)</small>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Your recipe will be reviewed by our admin team before it appears in the explore section.
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-upload me-2"></i> Upload Recipe
+                            </button>
+                            <a href="{{ url_for('user.dashboard') }}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
